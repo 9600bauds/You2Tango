@@ -229,3 +229,8 @@ WinActivate, ACTUALIZACION DE ARTICULOS ;HITLERS
 PegarPrecio98o99(1.04975)
 return
 
+#IfWinActive Tango Stock
+::cdm::Cambio de mercadería - Blas
+::cds::Corrección de stock - Blas
+::mui::Uso Interno - Blas
+#IfWinActive
