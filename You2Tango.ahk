@@ -229,7 +229,7 @@ WinActivate, ACTUALIZACION DE ARTICULOS ;HITLERS
 PegarPrecio98o99(1.04975)
 return
 
-#IfWinActive Tango Stock
+#IfWinActive SOS DE STOCK ; Works for EGRESOS and INGRESOS. AHK does not have an OR for this command.
 ::cdm::Cambio de mercadería - Blas
 ::cds::Corrección de stock - Blas
 ::mui::Uso Interno - Blas
