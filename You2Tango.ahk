@@ -101,14 +101,18 @@ PegarPrecio98o99(mult:=1){
     Send, %multiplied%
 }
 
-ActualizarDescripFecha(replacement:="06/2019", searchAfter:=false){
-    if(WinExist("ahk_class TFrmBuscar")){ ;if(PicExists("Images/VentanaBuscar.png")){
-        Send, {Enter}
-    }
-    
+ActualizarDescripFecha(doAfter:="", replacement:=""){
     if(not WinExist("ACTUALIZACION DE ARTICULOS")){
         MsgBox No existe ACTUALIZACION DE ARTICULOS.
         return
+    }
+    
+    if(replacement == ""){
+        FormatTime, replacement, , MM/yyyy
+    }
+    
+    if(WinExist("ahk_class TFrmBuscar")){ ;if(PicExists("Images/VentanaBuscar.png")){
+        Send, {Enter}
     }
     WinActivate, ACTUALIZACION DE ARTICULOS
     
@@ -125,9 +129,14 @@ ActualizarDescripFecha(replacement:="06/2019", searchAfter:=false){
     Send, {F10}
     Sleep, 150
     Send, {F10}
-    if(searchAfter){
+    
+    if(doAfter == "search"){
         Sleep, 150
         Send, ^b ;Ctrl+B: Buscar
+    }
+    else if(doAfter == "next"){
+        Sleep, 150
+        ProximoArticulo()
     }
 }
 
@@ -185,11 +194,11 @@ ProximoArticulo(){
 }
 
 Media_Prev::
-ActualizarDescripFecha("06/2019", true)
+ActualizarDescripFecha("search")
 return
 
 ^Media_Prev::
-ActualizarDescripFecha("06/2019", false)
+ActualizarDescripFecha("next")
 return
 
 Media_Next::
@@ -220,7 +229,3 @@ WinActivate, ACTUALIZACION DE ARTICULOS ;HITLERS
 PegarPrecio98o99(1.04975)
 return
 
-Pause::
-ControlFocus, TEdit8, ACTUALIZACION DE ARTICULOS
-;testing
-return
