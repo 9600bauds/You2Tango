@@ -63,6 +63,7 @@ CopiarUnidadMedidaVentas(){
 PegarPrecio98o99(mult:=1){
     Clipboard := RegExReplace(Clipboard, "\R") ;Eliminar líneas extra generadas por Excel y otros programas
     Clipboard := RegExReplace(Clipboard, ",", ".") ;Tango sólo quiere puntos.
+    Clipboard := RegExReplace(Clipboard, "\.(?![^.]+$)", "")  ;Quitar todos los puntos excepto el último.
     if(not IsNum(Clipboard)) {
         MsgBox, Clipboard is not a number.
         return
