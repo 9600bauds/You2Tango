@@ -123,6 +123,8 @@ ActualizarDescripFecha(doAfter:="", replacement:=""){
     ;if(not ClickPic("Images/DescripAdicional.png", 180, 5)){return}
     ControlFocus, TEdit8, ACTUALIZACION DE ARTICULOS ;TEdit8 es la ID del campo de texto de Descripción Adicional.
     WinWait, ACTUALIZACION DE ARTICULOS
+    SendMessage, 0x301, , , TEdit8, ACTUALIZACION DE ARTICULOS ;SendMessage, 0x301 envía CTRL+C. Por si accidentalmente sobreescribimos la descripción de un artículo equivocado.
+    WinWait, ACTUALIZACION DE ARTICULOS
     Send, %replacement%
     WinWait, ACTUALIZACION DE ARTICULOS
     Send, {F10}
