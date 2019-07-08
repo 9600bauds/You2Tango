@@ -240,7 +240,8 @@ PegarPrecio98o99(1.04975)
 return
 
 #IfWinActive SOS DE STOCK ; Works for EGRESOS and INGRESOS. AHK does not have an OR for this command.
-::cdm::Cambio de mercadería - Blas
-::cds::Corrección de stock - Blas
+::cdm::Cambio de Mercadería - Blas
+::cds::Corrección de Stock - Blas
 ::mui::Uso Interno - Blas
+::-b:: - Blas
 #IfWinActive
