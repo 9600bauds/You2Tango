@@ -144,7 +144,7 @@ ActualizarDescripFecha(doAfter:="", replacement:=""){
 }
 
 BuscarPorPortapapel(){
-    if WinExist("OpenOffice Calc")
+    if WinExist("OpenOffice Calc"){
         WinActivate, OpenOffice Calc
         WinWait, OpenOffice Calc
         if WinExist("Find & Replace"){
@@ -157,7 +157,14 @@ BuscarPorPortapapel(){
         }
         Sleep, 100
         Send, ^v{Enter} ;Ctrl+V+Enter
-    ; todo PDF
+    }
+    if WinExist("Adobe Reader"){
+        WinActivate, Adobe Reader
+        WinWait, Adobe Reader
+        Send, ^f ;Ctrl+F: Buscar
+        Sleep, 100
+        Send, ^v{Enter} ;Ctrl+V+Enter
+    }
 }
 
 SincronizarArticulosPrecio(){
