@@ -1,46 +1,10 @@
-﻿#NoEnv  ; Recommended for performance and compatibility with future AutoHotkey releases.
+﻿#Include <ClickPic>
+
+#NoEnv  ; Recommended for performance and compatibility with future AutoHotkey releases.
 #Warn  ; Enable warnings to assist with detecting common errors.
 SendMode Input  ; Recommended for new scripts due to its superior speed and reliability.
 SetWorkingDir %A_ScriptDir%  ; Ensures a consistent starting directory.
 SetTitleMatchMode, 2 ; Match window titles anywhere, not just at the start.
-
-IsNum( str ) { ;Fuck AHK.
-	if str is number
-		return true
-	return false
-}
-
-PicExists(filename) {
-    CoordMode, Pixel, Mouse, Screen
-    ImageSearch, FoundX, FoundY, 0, 0, A_ScreenWidth, A_ScreenHeight, %filename%
-    if (ErrorLevel = 2){
-        MsgBox Could not conduct the search for %filename%.
-        return false
-    }
-    if (ErrorLevel = 0){
-        return true
-    }
-    return false
-}
-
-ClickPic(filename, offsetX:=0, offsetY:=0) {  
-    CoordMode, Pixel, Mouse, Screen
-    ImageSearch, FoundX, FoundY, 0, 0, A_ScreenWidth, A_ScreenHeight, %filename%
-    if (ErrorLevel = 2){
-        MsgBox Could not conduct the search for %filename%.
-        return false
-    }
-    if (ErrorLevel = 1){
-        MsgBox Icon %filename% could not be found on the screen.
-        return false
-    }
-    
-    FoundX += offsetX
-    FoundY += offsetY
-    Click, %FoundX%, %FoundY%
-    return true
-}
-
 
 CopiarUnidadMedidaVentas(){
     if(not WinExist("ACTUALIZACION DE ARTICULOS")){
@@ -113,7 +77,7 @@ ActualizarDescripFecha(doAfter:="", replacement:=""){
         FormatTime, replacement, , MM/yyyy
     }
     
-    if(WinExist("ahk_class TFrmBuscar")){ ;if(PicExists("Images/VentanaBuscar.png")){
+    if(WinExist("ahk_class TFrmBuscar")){
         Send, {Enter}
     }
     WinActivate, ACTUALIZACION DE ARTICULOS
@@ -121,7 +85,6 @@ ActualizarDescripFecha(doAfter:="", replacement:=""){
     WinWait, ACTUALIZACION DE ARTICULOS
     WinMenuSelectItem, ACTUALIZACION DE ARTICULOS, , Modificar
     WinWait, ACTUALIZACION DE ARTICULOS
-    ;if(not ClickPic("Images/DescripAdicional.png", 180, 5)){return}
     ControlFocus, TEdit8, ACTUALIZACION DE ARTICULOS ;TEdit8 es la ID del campo de texto de Descripción Adicional.
     WinWait, ACTUALIZACION DE ARTICULOS
     SendMessage, 0x301, , , TEdit8, ACTUALIZACION DE ARTICULOS ;SendMessage, 0x301 envía CTRL+C. Por si accidentalmente sobreescribimos la descripción de un artículo equivocado.
@@ -168,6 +131,8 @@ BuscarPorPortapapel(){
     }
 }
 
+;Return TRUE: Se completó con éxito, incluyendo apretar enter en la búsqueda
+;Return FALSE: Probablemente no se completó la búsqueda y es necesario apretar Enter.
 SincronizarArticulosPrecio(){
     if(not WinExist("ACTUALIZACION DE PRECIOS INDIVIDUAL POR ARTICULO")){
         MsgBox No existe ACTUALIZACION DE PRECIOS INDIVIDUAL POR ARTICULO.
@@ -186,29 +151,52 @@ SincronizarArticulosPrecio(){
     Send, ^c{Esc} ;Ctrl+C+Enter: Copiar al portapapeles y Salir
     WinWait, ACTUALIZACION DE ARTICULOS
     tempArticleCode := Clipboard
-    Clipboard = tempClipboard
+    Clipboard := tempClipboard
     
     WinActivate, ACTUALIZACION DE PRECIOS INDIVIDUAL POR ARTICULO
     WinWait, ACTUALIZACION DE PRECIOS INDIVIDUAL POR ARTICULO
     Send, ^b ;Ctrl+B: Buscar
-    WinWait, ahk_class TFrmBuscar ;Esta es la ventana Buscar.
+    WinWait, ahk_class TFrmBuscar ;Esta es la ventana Buscar.  
     Send, %tempArticleCode%
+    
+    if(PicExists("Images/BusquedaInactiva_Seleccionado.png")){
+        if(WaitNotPic("Images/BusquedaInactiva_Seleccionado.png")){
+            Send, {Enter}
+            return true
+        }
+    }
+    return false
 }
 
 ProximoArticulo(){ 
     if(WinExist("ACTUALIZACION DE ARTICULOS")){
+        WinWait, ACTUALIZACION DE ARTICULOS
         ControlSend,,{PGDN}, ACTUALIZACION DE ARTICULOS
     }
     if(WinExist("ACTUALIZACION DE PRECIOS INDIVIDUAL POR ARTICULO")){
+        WinWait, ACTUALIZACION DE PRECIOS INDIVIDUAL POR ARTICULO
         ControlSend,,{PGDN}, ACTUALIZACION DE PRECIOS INDIVIDUAL POR ARTICULO
     }
 }
 
-Media_Prev::
+AnteriorArticulo(){
+    if(WinExist("ACTUALIZACION DE ARTICULOS")){
+        ControlSend,,{PGUP}, ACTUALIZACION DE ARTICULOS
+    }
+    if(WinExist("ACTUALIZACION DE PRECIOS INDIVIDUAL POR ARTICULO")){
+        ControlSend,,{PGUP}, ACTUALIZACION DE PRECIOS INDIVIDUAL POR ARTICULO
+    }
+}
+
+ScrollLock::
+MsgBox Testing...
+return
+
+Pause::
 ActualizarDescripFecha("search")
 return
 
-^Media_Prev::
+^Pause::
 ActualizarDescripFecha("next")
 return
 
@@ -216,8 +204,20 @@ Media_Next::
 ProximoArticulo()
 return
 
+Media_Prev::
+AnteriorArticulo()
+return
+
 Launch_Mail::
 SincronizarArticulosPrecio()
+return
+
+^Launch_Mail::
+if(SincronizarArticulosPrecio() == true){
+    CopiarUnidadMedidaVentas()
+    Sleep,100
+    BuscarPorPortapapel()
+}
 return
 
 Browser_Search::
@@ -232,15 +232,15 @@ return
 
 Browser_Home::
 WinActivate, ACTUALIZACION DE ARTICULOS ;HITLERS
-PegarPrecio98o99(1.1495)
+PegarPrecio98o99(1.05633)
 return
 
 ^Browser_Home::
 WinActivate, ACTUALIZACION DE ARTICULOS ;HITLERS
-PegarPrecio98o99(1.04975)
+PegarPrecio98o99(1.05633)
 return
 
-#IfWinActive SOS DE STOCK ; Works for EGRESOS and INGRESOS. AHK does not have an OR for this command.
+#IfWinActive SOS DE STOCK ; Works for EGRESOS and INGRESOS. AHK does not have an OR operand for this command.
 ::cdm::Cambio de Mercadería - Blas
 ::cds::Corrección de Stock - Blas
 ::mui::Uso Interno - Blas
