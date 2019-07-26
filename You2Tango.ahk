@@ -77,18 +77,18 @@ ActualizarDescripFecha(doAfter:="", replacement:=""){
     }
     
     if(WinExist("ahk_class TFrmBuscar")){
-        Send, {Enter}
+        CerrarVentanaBuscar()
     }
-    WinActivate, ACTUALIZACION DE ARTICULOS
     
+    WinActivate, ACTUALIZACION DE ARTICULOS
     WinWait, ACTUALIZACION DE ARTICULOS
+    
+    ;TEdit8 es la ID del campo de texto de Descripción Adicional.
+    ControlGetText, Clipboard, TEdit8, ACTUALIZACION DE ARTICULOS ;Copiamos al portapapeles, por si accidentalmente sobreescribimos la descripción de un artículo equivocado.
     WinMenuSelectItem, ACTUALIZACION DE ARTICULOS, , Modificar
     WinWait, ACTUALIZACION DE ARTICULOS
-    ControlFocus, TEdit8, ACTUALIZACION DE ARTICULOS ;TEdit8 es la ID del campo de texto de Descripción Adicional.
-    WinWait, ACTUALIZACION DE ARTICULOS
-    SendMessage, 0x301, , , TEdit8, ACTUALIZACION DE ARTICULOS ;SendMessage, 0x301 envía CTRL+C. Por si accidentalmente sobreescribimos la descripción de un artículo equivocado.
-    WinWait, ACTUALIZACION DE ARTICULOS
-    Send, %replacement%
+    ControlFocus, TEdit8, ACTUALIZACION DE ARTICULOS ;Si no hacemos focus, Tango no detecta que hicimos algún cambio.
+    ControlSetText, TEdit8, %replacement%, ACTUALIZACION DE ARTICULOS
     WinWait, ACTUALIZACION DE ARTICULOS
     Send, {F10}
     Sleep, 150
@@ -98,7 +98,7 @@ ActualizarDescripFecha(doAfter:="", replacement:=""){
     
     if(doAfter == "search"){
         Sleep, 150
-        Send, ^b ;Ctrl+B: Buscar
+        WinMenuSelectItem, ACTUALIZACION DE ARTICULOS, , Buscar, Por Clave
     }
     else if(doAfter == "next"){
         Sleep, 150
@@ -144,22 +144,11 @@ SincronizarArticulosPrecio(){
     if(WinExist("ahk_class TFrmBuscar")){
         CerrarVentanaBuscar()
     }
-    WinActivate, ACTUALIZACION DE ARTICULOS
-    
-    WinWait, ACTUALIZACION DE ARTICULOS
-    WinMenuSelectItem, ACTUALIZACION DE ARTICULOS, , Copiar
-    WinWait, ACTUALIZACION DE ARTICULOS
-    tempClipboard := Clipboard ;Para "preservar" el portapapeles, usamos una variable auxiliar.
-    Send, ^c{Esc} ;Ctrl+C+Enter: Copiar al portapapeles y Salir
-    WinWait, ACTUALIZACION DE ARTICULOS
-    tempArticleCode := Clipboard
-    Clipboard := tempClipboard
-    
-    WinActivate, ACTUALIZACION DE PRECIOS INDIVIDUAL POR ARTICULO
-    WinWait, ACTUALIZACION DE PRECIOS INDIVIDUAL POR ARTICULO
-    Send, ^b ;Ctrl+B: Buscar
-    WinWait, ahk_class TFrmBuscar ;Ésta es la ventana Buscar.  
-    Send, %tempArticleCode%
+
+    ControlGetText, CodigoArticulo, TEdit11, ACTUALIZACION DE ARTICULOS ;TEdit11 es el campo de código de artículo.
+    WinMenuSelectItem, ACTUALIZACION DE PRECIOS INDIVIDUAL POR ARTICULO, , Buscar, Por Clave
+    WinWait, ahk_class TFrmBuscar ;Ésta es la ventana Buscar.
+    ControlSend, TcxCustomInnerTextEdit1, %CodigoArticulo%, ahk_class TFrmBuscar 
     
     return CerrarVentanaBuscar()
 }
@@ -226,15 +215,11 @@ AnteriorArticulo(){
     }
 }
 
-ScrollLock::
-CerrarVentanaBuscar()
-return
-
-Pause::
+Media_Prev::
 ActualizarDescripFecha("search")
 return
 
-^Pause::
+^Media_Prev::
 ActualizarDescripFecha("next")
 return
 
@@ -242,7 +227,7 @@ Media_Next::
 ProximoArticulo()
 return
 
-Media_Prev::
+^Media_Next::
 AnteriorArticulo()
 return
 
