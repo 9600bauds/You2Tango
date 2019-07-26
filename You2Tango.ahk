@@ -15,7 +15,6 @@ CopiarUnidadMedidaVentas(){
     WinMenuSelectItem, ACTUALIZACION DE ARTICULOS, , Modificar ;Modo Modificar.
     WinWait, ACTUALIZACION DE ARTICULOS
     
-    ;if(not ClickPic("Images/UnidaddeMedidaVentas.png", 175, 5)){return}
     ControlFocus, TEdit4, ACTUALIZACION DE ARTICULOS ;TEdit4 es el ID del campo de texto Unidad de Medida Ventas.    
     SendMessage, 0x301, , , TEdit4, ACTUALIZACION DE ARTICULOS ;"SendMessage, 0x301" envia CTRL+C.
     WinWait, ACTUALIZACION DE ARTICULOS
@@ -45,21 +44,21 @@ PegarPrecio98o99(mult:=1){
     WinWait, ACTUALIZACION DE PRECIOS INDIVIDUAL POR ARTICULO
     WinMenuSelectItem, ACTUALIZACION DE PRECIOS INDIVIDUAL POR ARTICULO, , Modificar
     WinWait, ACTUALIZACION DE ARTICULOS
-    if(PicExists("Images/Dolar.png")){
-        if(not ClickPic("Images/Dolar.png", 425, 5)){
+    if(PicExists("Images/ActualizacionPrecios/Dolar.png")){
+        if(not ClickPic("Images/ActualizacionPrecios/Dolar.png", 425, 5)){
             return
         }
         WinWait, ACTUALIZACION DE ARTICULOS
-        if(not ClickPic("Images/Dolar_Seleccionado.png", 425, 5)){
+        if(not ClickPic("Images/ActualizacionPrecios/Dolar_Seleccionado.png", 425, 5)){
             return
         }
     }
     else{
-        if(not ClickPic("Images/NoUsarUsoInterno.png", 425, 5)){
+        if(not ClickPic("Images/ActualizacionPrecios/NoUsarUsoInterno.png", 425, 5)){
             return
         }
         WinWait, ACTUALIZACION DE ARTICULOS
-        if(not ClickPic("Images/NoUsarUsoInterno_Seleccionado.png", 425, 5)){
+        if(not ClickPic("Images/ActualizacionPrecios/NoUsarUsoInterno_Seleccionado.png", 425, 5)){
             return
         }
     }
@@ -142,6 +141,9 @@ SincronizarArticulosPrecio(){
         MsgBox No existe ACTUALIZACION DE ARTICULOS.
         return
     }
+    if(WinExist("ahk_class TFrmBuscar")){
+        CerrarVentanaBuscar()
+    }
     WinActivate, ACTUALIZACION DE ARTICULOS
     
     WinWait, ACTUALIZACION DE ARTICULOS
@@ -156,26 +158,62 @@ SincronizarArticulosPrecio(){
     WinActivate, ACTUALIZACION DE PRECIOS INDIVIDUAL POR ARTICULO
     WinWait, ACTUALIZACION DE PRECIOS INDIVIDUAL POR ARTICULO
     Send, ^b ;Ctrl+B: Buscar
-    WinWait, ahk_class TFrmBuscar ;Esta es la ventana Buscar.  
+    WinWait, ahk_class TFrmBuscar ;Ésta es la ventana Buscar.  
     Send, %tempArticleCode%
     
-    if(PicExists("Images/BusquedaInactiva_Seleccionado.png")){
-        if(WaitNotPic("Images/BusquedaInactiva_Seleccionado.png")){
-            Send, {Enter}
-            return true
+    return CerrarVentanaBuscar()
+}
+
+CerrarVentanaBuscar(){
+    if(not WinExist("ahk_class TFrmBuscar")){
+        MsgBox No existe ahk_class TFrmBuscar.
+        return
+    }
+    WinActivate, ahk_class TFrmBuscar
+    
+    ControlGetText, CodigoIngresado, TcxCustomInnerTextEdit1, ahk_class TFrmBuscar
+    if(CodigoIngresado == ""){
+        Send, {Esc}
+        WinWaitClose, ahk_class TFrmBuscar
+        return true
+    }
+    
+    ControlGetText, ModoDeBusqueda, TComboBox1, ahk_class TFrmBuscar
+    if(ModoDeBusqueda == "Sinónimo"){
+        ImageToSearch = Images/VentanaBuscar/Sinonimo_Inactivo.png
+        ControlGetFocus, CampoSeleccionado, ahk_class TFrmBuscar
+        if(CampoSeleccionado == "TcxCustomInnerTextEdit1"){
+            ImageToSearch = Images/VentanaBuscar/Sinonimo_Activo.png
         }
     }
+    else if(ModoDeBusqueda == "Cód. Artículo"){
+        ImageToSearch = Images/VentanaBuscar/CodArticulo_Inactivo.png
+        ControlGetFocus, CampoSeleccionado, ahk_class TFrmBuscar
+        if(CampoSeleccionado == "TcxCustomInnerTextEdit1"){
+            ImageToSearch = Images/VentanaBuscar/CodArticulo_Activo.png
+        }
+    }
+        
+    if(WaitNotPic(ImageToSearch)){
+        Send, {Enter}
+        WinWaitClose, ahk_class TFrmBuscar
+        return true
+    }
+    Send, {Esc}
+    WinWaitClose, ahk_class TFrmBuscar
     return false
 }
 
 ProximoArticulo(){ 
     if(WinExist("ACTUALIZACION DE ARTICULOS")){
-        WinWait, ACTUALIZACION DE ARTICULOS
-        ControlSend,,{PGDN}, ACTUALIZACION DE ARTICULOS
+        ;WinWait, ACTUALIZACION DE ARTICULOS
+        WinMenuSelectItem, ACTUALIZACION DE ARTICULOS, , Buscar, Siguiente ;Modo Modificar.
+        ;ControlSend,,{PGDN}, ACTUALIZACION DE ARTICULOS
     }
     if(WinExist("ACTUALIZACION DE PRECIOS INDIVIDUAL POR ARTICULO")){
-        WinWait, ACTUALIZACION DE PRECIOS INDIVIDUAL POR ARTICULO
-        ControlSend,,{PGDN}, ACTUALIZACION DE PRECIOS INDIVIDUAL POR ARTICULO
+        ;WinWait, ACTUALIZACION DE PRECIOS INDIVIDUAL POR ARTICULO
+        WinMenuSelectItem, ACTUALIZACION DE PRECIOS INDIVIDUAL POR ARTICULO, , Buscar, Siguiente
+        ;ControlSend,,{PGDN}, ACTUALIZACION DE PRECIOS INDIVIDUAL POR ARTICULO
     }
 }
 
@@ -189,7 +227,7 @@ AnteriorArticulo(){
 }
 
 ScrollLock::
-MsgBox Testing...
+CerrarVentanaBuscar()
 return
 
 Pause::
@@ -214,6 +252,7 @@ return
 
 ^Launch_Mail::
 if(SincronizarArticulosPrecio() == true){
+    Sleep, 800
     CopiarUnidadMedidaVentas()
     Sleep,100
     BuscarPorPortapapel()
@@ -232,12 +271,12 @@ return
 
 Browser_Home::
 WinActivate, ACTUALIZACION DE ARTICULOS ;HITLERS
-PegarPrecio98o99(1.05633)
+PegarPrecio98o99(1.16)
 return
 
 ^Browser_Home::
 WinActivate, ACTUALIZACION DE ARTICULOS ;HITLERS
-PegarPrecio98o99(1.05633)
+PegarPrecio98o99(1.04975)
 return
 
 #IfWinActive SOS DE STOCK ; Works for EGRESOS and INGRESOS. AHK does not have an OR operand for this command.

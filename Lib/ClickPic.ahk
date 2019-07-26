@@ -34,17 +34,17 @@ ClickPic(filename, offsetX:=0, offsetY:=0) {
 WaitNotPic(filename, interval:=100, tries:=25) {
     CoordMode, Pixel, Mouse, Screen
     
-    Loop, 25
+    Loop, 50
     {
         ImageSearch, FoundX, FoundY, 0, 0, A_ScreenWidth, A_ScreenHeight, %filename%
-        if (ErrorLevel = 2){
+        if (ErrorLevel == 2){
             MsgBox Could not conduct the search for %filename%.
             return false
         }
-        if (ErrorLevel = 1){
+        if (ErrorLevel == 1){
             return 1
         }
-        Sleep, 50
+        Sleep, 25
     }
     return 0
 }
