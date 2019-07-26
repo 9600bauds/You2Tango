@@ -12,19 +12,11 @@ CopiarUnidadMedidaVentas(){
         return
     }
     
-    WinMenuSelectItem, ACTUALIZACION DE ARTICULOS, , Modificar ;Modo Modificar.
-    WinWait, ACTUALIZACION DE ARTICULOS
-    
-    ControlFocus, TEdit4, ACTUALIZACION DE ARTICULOS ;TEdit4 es el ID del campo de texto Unidad de Medida Ventas.    
-    SendMessage, 0x301, , , TEdit4, ACTUALIZACION DE ARTICULOS ;"SendMessage, 0x301" envia CTRL+C.
-    WinWait, ACTUALIZACION DE ARTICULOS
-    
-    ControlSend,,{Esc}, ACTUALIZACION DE ARTICULOS ;Cancelar modo Modificar
-    WinWait, ACTUALIZACION DE ARTICULOS
+    ;TEdit4 es el campo de unidad de Medida Ventas.
+    ControlGetText, Clipboard, TEdit4, ACTUALIZACION DE ARTICULOS
 }
 
 PegarPrecio98o99(mult:=1){
-    Clipboard := RegExReplace(Clipboard, "\R") ;Eliminar líneas extra generadas por Excel y otros programas
     Clipboard := RegExReplace(Clipboard, ",", ".") ;Reemplazar comas por puntos.
     Clipboard := RegExReplace(Clipboard, "\.(?![^.]+$)")  ;Quitar todos los puntos excepto el último.
     Clipboard := RegExReplace(Clipboard, "[^0-9.]") ;Eliminar todo excepto números y puntos.
