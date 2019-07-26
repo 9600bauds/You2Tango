@@ -27,14 +27,17 @@ PegarPrecio98o99(mult:=1){
     }
     multiplied := (Clipboard * mult)
     multiplied = % Round(multiplied, 2) ;Tango sólo quiere 2 decimales.
-
+   
     if(not WinExist("ACTUALIZACION DE PRECIOS INDIVIDUAL POR ARTICULO")){
         MsgBox No existe ACTUALIZACION DE PRECIOS INDIVIDUAL POR ARTICULO.
         return
     }
-    WinActivate, ACTUALIZACION DE PRECIOS INDIVIDUAL POR ARTICULO
     
-    WinWait, ACTUALIZACION DE PRECIOS INDIVIDUAL POR ARTICULO
+    If(!IsAlwaysOnTop("ACTUALIZACION DE PRECIOS INDIVIDUAL POR ARTICULO")){
+        WinActivate, ACTUALIZACION DE PRECIOS INDIVIDUAL POR ARTICULO
+        WinWait, ACTUALIZACION DE PRECIOS INDIVIDUAL POR ARTICULO
+    }
+    
     WinMenuSelectItem, ACTUALIZACION DE PRECIOS INDIVIDUAL POR ARTICULO, , Modificar
     WinWait, ACTUALIZACION DE ARTICULOS
     if(PicExists("Images/ActualizacionPrecios/Dolar.png")){
@@ -73,8 +76,10 @@ ActualizarDescripFecha(doAfter:="", replacement:=""){
         CerrarVentanaBuscar()
     }
     
-    WinActivate, ACTUALIZACION DE ARTICULOS
-    WinWait, ACTUALIZACION DE ARTICULOS
+    If(!IsAlwaysOnTop("ACTUALIZACION DE ARTICULOS")){
+        WinActivate, ACTUALIZACION DE ARTICULOS
+        WinWait, ACTUALIZACION DE ARTICULOS
+    }
     
     ;TEdit8 es la ID del campo de texto de Descripción Adicional.
     ControlGetText, Clipboard, TEdit8, ACTUALIZACION DE ARTICULOS ;Copiamos al portapapeles, por si accidentalmente sobreescribimos la descripción de un artículo equivocado.
@@ -190,6 +195,37 @@ AnteriorArticulo(){
     }
 }
 
+EstilizarVentanas(Activar := 1){
+    if(Activar == 1){
+        WinSet, AlwaysOnTop, On, ACTUALIZACION DE ARTICULOS
+        WinSet, Region, 0-0 W572 H222 R11-11, ACTUALIZACION DE ARTICULOS ;Máscara de 572x222 empezando en 0,0 con bordes suaves de 11 pixeles.
+        
+        WinSet, AlwaysOnTop, On, ACTUALIZACION DE PRECIOS INDIVIDUAL POR ARTICULO
+        WinGetPos, X, Y, , , ACTUALIZACION DE ARTICULOS
+        WinMove, ACTUALIZACION DE PRECIOS INDIVIDUAL POR ARTICULO, , X, Y+222
+    }
+    else{
+        WinSet, AlwaysOnTop, Off, ACTUALIZACION DE ARTICULOS
+        WinSet, Region, , ACTUALIZACION DE ARTICULOS
+        
+        WinSet, AlwaysOnTop, Off, ACTUALIZACION DE PRECIOS INDIVIDUAL POR ARTICULO
+    }
+}
+
+Launch_Media::
+MsgBox, Testing...
+return
+
+Volume_Up::
+EstilizarVentanas(1)
+return
+
+Volume_Down::
+EstilizarVentanas(0)
+return
+
+;Volume_Mute, Media_Play_Pause
+
 Media_Prev::
 ActualizarDescripFecha("search")
 return
@@ -229,12 +265,10 @@ BuscarPorPortapapel()
 return
 
 Browser_Home::
-WinActivate, ACTUALIZACION DE ARTICULOS ;HITLERS
 PegarPrecio98o99(1.16)
 return
 
 ^Browser_Home::
-WinActivate, ACTUALIZACION DE ARTICULOS ;HITLERS
 PegarPrecio98o99(1.04975)
 return
 

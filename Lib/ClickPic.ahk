@@ -54,3 +54,8 @@ IsNum( str ) { ;Fuck AHK.
 		return true
 	return false
 }
+
+IsAlwaysOnTop( Window ) {
+    WinGet, Estilo, ExStyle, %Window%
+    Return (Estilo & 0x8) ; 0x8 is WS_EX_TOPMOST.
+}
