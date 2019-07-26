@@ -122,8 +122,6 @@ BuscarPorPortapapel(){
     }
 }
 
-;Return TRUE: Se completó con éxito, incluyendo apretar enter en la búsqueda
-;Return FALSE: Probablemente no se completó la búsqueda y es necesario apretar Enter.
 SincronizarArticulosPrecio(){
     if(not WinExist("ACTUALIZACION DE PRECIOS INDIVIDUAL POR ARTICULO")){
         MsgBox No existe ACTUALIZACION DE PRECIOS INDIVIDUAL POR ARTICULO.
@@ -142,7 +140,7 @@ SincronizarArticulosPrecio(){
     WinWait, ahk_class TFrmBuscar ;Ésta es la ventana Buscar.
     ControlSend, TcxCustomInnerTextEdit1, %CodigoArticulo%, ahk_class TFrmBuscar 
     
-    return CerrarVentanaBuscar()
+    CerrarVentanaBuscar()
 }
 
 CerrarVentanaBuscar(){
@@ -152,37 +150,21 @@ CerrarVentanaBuscar(){
     }
     WinActivate, ahk_class TFrmBuscar
     
+    Control, Check, , TCheckBox4, ahk_class TFrmBuscar ;Activar FILTRAR
+    Control, Uncheck, , TCheckBox3, ahk_class TFrmBuscar ;Desactivar INCREMENTAL
+    
     ControlGetText, CodigoIngresado, TcxCustomInnerTextEdit1, ahk_class TFrmBuscar
     if(CodigoIngresado == ""){
         Send, {Esc}
         WinWaitClose, ahk_class TFrmBuscar
-        return true
+        return
     }
     
-    ControlGetText, ModoDeBusqueda, TComboBox1, ahk_class TFrmBuscar
-    if(ModoDeBusqueda == "Sinónimo"){
-        ImageToSearch = Images/VentanaBuscar/Sinonimo_Inactivo.png
-        ControlGetFocus, CampoSeleccionado, ahk_class TFrmBuscar
-        if(CampoSeleccionado == "TcxCustomInnerTextEdit1"){
-            ImageToSearch = Images/VentanaBuscar/Sinonimo_Activo.png
-        }
-    }
-    else if(ModoDeBusqueda == "Cód. Artículo"){
-        ImageToSearch = Images/VentanaBuscar/CodArticulo_Inactivo.png
-        ControlGetFocus, CampoSeleccionado, ahk_class TFrmBuscar
-        if(CampoSeleccionado == "TcxCustomInnerTextEdit1"){
-            ImageToSearch = Images/VentanaBuscar/CodArticulo_Activo.png
-        }
-    }
-        
-    if(WaitNotPic(ImageToSearch)){
+    Send, {Enter}
+    If(WinExist("ahk_class TFrmBuscar")){ ;Puede que ya hayamos apretado Enter nosotros.
         Send, {Enter}
-        WinWaitClose, ahk_class TFrmBuscar
-        return true
     }
-    Send, {Esc}
     WinWaitClose, ahk_class TFrmBuscar
-    return false
 }
 
 ProximoArticulo(){ 
@@ -228,12 +210,11 @@ SincronizarArticulosPrecio()
 return
 
 ^Launch_Mail::
-if(SincronizarArticulosPrecio() == true){
-    Sleep, 800
-    CopiarUnidadMedidaVentas()
-    Sleep,100
-    BuscarPorPortapapel()
-}
+SincronizarArticulosPrecio()
+Sleep, 100
+CopiarUnidadMedidaVentas()
+Sleep, 100
+BuscarPorPortapapel()
 return
 
 Browser_Search::
