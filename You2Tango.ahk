@@ -118,6 +118,10 @@ BuscarPorPortapapel(){
         }
         Sleep, 100
         Send, ^v{Enter} ;Ctrl+V+Enter
+        Sleep, 100
+        if(PicExists("Images/OpenOfficeCalc/EndOfSheet.png")){ ;Damn you, OpenOffice.
+            Send, {Enter}
+        }
     }
     if WinExist("Adobe Reader"){
         WinActivate, Adobe Reader
@@ -224,22 +228,22 @@ Volume_Down::
 EstilizarVentanas(0)
 return
 
-;Volume_Mute, Media_Play_Pause
+;Volume_Mute::
 
-Media_Prev::
+Media_Play_Pause::
 ActualizarDescripFecha("search")
 return
 
-^Media_Prev::
+^Media_Play_Pause::
 ActualizarDescripFecha("next")
+return
+
+Media_Prev::
+AnteriorArticulo()
 return
 
 Media_Next::
 ProximoArticulo()
-return
-
-^Media_Next::
-AnteriorArticulo()
 return
 
 Launch_Mail::
@@ -255,10 +259,6 @@ BuscarPorPortapapel()
 return
 
 Browser_Search::
-CopiarUnidadMedidaVentas()
-return
-
-^Browser_Search::
 CopiarUnidadMedidaVentas()
 Sleep,100
 BuscarPorPortapapel()
