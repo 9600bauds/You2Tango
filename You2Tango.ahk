@@ -7,14 +7,27 @@ SendMode Input  ; Recommended for new scripts due to its superior speed and reli
 SetWorkingDir %A_ScriptDir%  ; Ensures a consistent starting directory.
 SetTitleMatchMode, 2 ; Match window titles anywhere, not just at the start.
 
+global ventanaArticulos := "ACTUALIZACION DE ARTICULOS"
+global campoMedidaVentas := "TEdit4"
+global campoCodigoArt_Articulos := "TEdit11"
+global campoDescAdicional := "TEdit8"
+
+global ventanaPrecios := "ACTUALIZACION DE PRECIOS INDIVIDUAL POR ARTICULO"
+global campoCodigoArt_Precios := "TEdit6"
+global campoPrecioActual := "TNumEditTg1"
+
+global ventanaBuscar := "ahk_class TFrmBuscar"
+global campoContenido_Buscar := "TcxCustomInnerTextEdit1"
+
+global ventanaNotepad := "ahk_class Notepad"
+
 CopiarUnidadMedidaVentas(){
-    if(not WinExist("ACTUALIZACION DE ARTICULOS")){
-        MsgBox No existe ACTUALIZACION DE ARTICULOS.
+    if(not WinExist(ventanaArticulos)){
+        MsgBox No existe %ventanaArticulos%.
         return
     }
-    
-    ;TEdit4 es el campo de unidad de Medida Ventas.
-    ControlGetText, Clipboard, TEdit4, ACTUALIZACION DE ARTICULOS
+
+    ControlGetText, Clipboard, %campoMedidaVentas%, %ventanaArticulos%
 }
 
 PegarPrecio98o99(mult:=1){
@@ -28,23 +41,23 @@ PegarPrecio98o99(mult:=1){
     multiplied := (Clipboard * mult)
     multiplied = % Round(multiplied, 2) ;Tango sólo quiere 2 decimales.
    
-    if(not WinExist("ACTUALIZACION DE PRECIOS INDIVIDUAL POR ARTICULO")){
-        MsgBox No existe ACTUALIZACION DE PRECIOS INDIVIDUAL POR ARTICULO.
+    if(not WinExist(ventanaPrecios)){
+        MsgBox No existe %ventanaPrecios%.
         return
     }
     
-    If(!IsAlwaysOnTop("ACTUALIZACION DE PRECIOS INDIVIDUAL POR ARTICULO")){
-        WinActivate, ACTUALIZACION DE PRECIOS INDIVIDUAL POR ARTICULO
-        WinWait, ACTUALIZACION DE PRECIOS INDIVIDUAL POR ARTICULO
+    If(!IsAlwaysOnTop(ventanaPrecios)){
+        WinActivate, %ventanaPrecios%
+        WinWait, %ventanaPrecios%
     }
     
-    WinMenuSelectItem, ACTUALIZACION DE PRECIOS INDIVIDUAL POR ARTICULO, , Modificar
-    WinWait, ACTUALIZACION DE PRECIOS INDIVIDUAL POR ARTICULO
+    WinMenuSelectItem, %ventanaPrecios%, , Modificar
+    WinWait, %ventanaPrecios%
     if(PicExists("Images/ActualizacionPrecios/Dolar.png")){
         if(not ClickPic("Images/ActualizacionPrecios/Dolar.png", 425, 5)){
             return
         }
-        WinWait, ACTUALIZACION DE PRECIOS INDIVIDUAL POR ARTICULO
+        WinWait, %ventanaPrecios%
         if(not ClickPic("Images/ActualizacionPrecios/Dolar_Seleccionado.png", 425, 5)){
             return
         }
@@ -53,15 +66,15 @@ PegarPrecio98o99(mult:=1){
         if(not ClickPic("Images/ActualizacionPrecios/NoUsarUsoInterno.png", 425, 5)){
             return
         }
-        WinWait, ACTUALIZACION DE PRECIOS INDIVIDUAL POR ARTICULO
+        WinWait, %ventanaPrecios%
         if(not ClickPic("Images/ActualizacionPrecios/NoUsarUsoInterno_Seleccionado.png", 425, 5)){
             return
         }
     }
-    WinWait, ACTUALIZACION DE PRECIOS INDIVIDUAL POR ARTICULO
+    WinWait, %ventanaPrecios%
     
-    ControlGetText, itemID, TEdit6, ACTUALIZACION DE PRECIOS INDIVIDUAL POR ARTICULO
-    ControlGetText, oldPrice, TNumEditTg1, ACTUALIZACION DE PRECIOS INDIVIDUAL POR ARTICULO
+    ControlGetText, itemID, %campoCodigoArt_Precios%, %ventanaPrecios%
+    ControlGetText, oldPrice, %campoPrecioActual%, %ventanaPrecios%
     LogPriceChange(itemID, oldPrice, multiplied)
     
     Send, %multiplied%
@@ -71,8 +84,8 @@ PegarPrecio98o99(mult:=1){
 }
 
 ActualizarDescripFecha(doAfter:="", replacement:=""){
-    if(not WinExist("ACTUALIZACION DE ARTICULOS")){
-        MsgBox No existe ACTUALIZACION DE ARTICULOS.
+    if(not WinExist(ventanaArticulos)){
+        MsgBox No existe %ventanaArticulos%.
         return
     }
     
@@ -80,22 +93,21 @@ ActualizarDescripFecha(doAfter:="", replacement:=""){
         FormatTime, replacement, , MM/yyyy
     }
     
-    if(WinExist("ahk_class TFrmBuscar")){
+    if(WinExist(ventanaBuscar)){
         CerrarVentanaBuscar()
     }
     
-    If(!IsAlwaysOnTop("ACTUALIZACION DE ARTICULOS")){
-        WinActivate, ACTUALIZACION DE ARTICULOS
-        WinWait, ACTUALIZACION DE ARTICULOS
+    If(!IsAlwaysOnTop(ventanaArticulos)){
+        WinActivate, %ventanaArticulos%
+        WinWait, %ventanaArticulos%
     }
     
-    ;TEdit8 es la ID del campo de texto de Descripción Adicional.
-    ControlGetText, Clipboard, TEdit8, ACTUALIZACION DE ARTICULOS ;Copiamos al portapapeles, por si accidentalmente sobreescribimos la descripción de un artículo equivocado.
-    WinMenuSelectItem, ACTUALIZACION DE ARTICULOS, , Modificar
-    WinWait, ACTUALIZACION DE ARTICULOS
-    ControlFocus, TEdit8, ACTUALIZACION DE ARTICULOS ;Si no hacemos focus, Tango no detecta que hicimos algún cambio.
-    ControlSetText, TEdit8, %replacement%, ACTUALIZACION DE ARTICULOS
-    WinWait, ACTUALIZACION DE ARTICULOS
+    ControlGetText, Clipboard, %campoDescAdicional%, %ventanaArticulos% ;Copiamos al portapapeles, por si accidentalmente sobreescribimos la descripción de un artículo equivocado.
+    WinMenuSelectItem, %ventanaArticulos%, , Modificar
+    WinWait, %ventanaArticulos%
+    ControlFocus, %campoDescAdicional%, %ventanaArticulos% ;Si no hacemos focus, Tango no detecta que hicimos algún cambio.
+    ControlSetText, %campoDescAdicional%, %replacement%, %ventanaArticulos%
+    WinWait, %ventanaArticulos%
     Send, {F10}
     Sleep, 150
     Send, {F10}
@@ -104,7 +116,7 @@ ActualizarDescripFecha(doAfter:="", replacement:=""){
     
     if(doAfter == "search"){
         Sleep, 150
-        WinMenuSelectItem, ACTUALIZACION DE ARTICULOS, , Buscar, Por Clave
+        WinMenuSelectItem, %ventanaArticulos%, , Buscar, Por Clave
     }
     else if(doAfter == "next"){
         Sleep, 150
@@ -141,103 +153,103 @@ BuscarPorPortapapel(){
 }
 
 SincronizarArticulosPrecio(){
-    if(not WinExist("ACTUALIZACION DE PRECIOS INDIVIDUAL POR ARTICULO")){
-        MsgBox No existe ACTUALIZACION DE PRECIOS INDIVIDUAL POR ARTICULO.
+    if(not WinExist(ventanaPrecios)){
+        MsgBox No existe %ventanaPrecios%.
         return
     }
-    if(not WinExist("ACTUALIZACION DE ARTICULOS")){
-        MsgBox No existe ACTUALIZACION DE ARTICULOS.
+    if(not WinExist(ventanaArticulos)){
+        MsgBox No existe %ventanaArticulos%.
         return
     }
-    if(WinExist("ahk_class TFrmBuscar")){
+    if(WinExist(ventanaBuscar)){
         CerrarVentanaBuscar()
     }
 
-    ControlGetText, CodigoArticulo, TEdit11, ACTUALIZACION DE ARTICULOS ;TEdit11 es el campo de código de artículo.
-    WinMenuSelectItem, ACTUALIZACION DE PRECIOS INDIVIDUAL POR ARTICULO, , Buscar, Por Clave
-    WinWait, ahk_class TFrmBuscar ;Ésta es la ventana Buscar.
-    ControlSend, TcxCustomInnerTextEdit1, %CodigoArticulo%, ahk_class TFrmBuscar 
+    ControlGetText, CodigoArticulo, %campoCodigoArt_Articulos%, %ventanaArticulos%
+    WinMenuSelectItem, %ventanaPrecios%, , Buscar, Por Clave
+    WinWait, %ventanaBuscar% ;Ésta es la ventana Buscar.
+    ControlSend, %campoContenido_Buscar%, %CodigoArticulo%, %ventanaBuscar% 
     
     CerrarVentanaBuscar()
 }
 
 CerrarVentanaBuscar(){
-    if(not WinExist("ahk_class TFrmBuscar")){
-        MsgBox No existe ahk_class TFrmBuscar.
+    if(not WinExist(ventanaBuscar)){
+        MsgBox No existe %ventanaBuscar%.
         return
     }
-    WinActivate, ahk_class TFrmBuscar
+    WinActivate, %ventanaBuscar%
     
-    Control, Check, , TCheckBox4, ahk_class TFrmBuscar ;Activar FILTRAR
-    Control, Uncheck, , TCheckBox3, ahk_class TFrmBuscar ;Desactivar INCREMENTAL
+    Control, Check, , TCheckBox4, %ventanaBuscar% ;Activar FILTRAR
+    Control, Uncheck, , TCheckBox3, %ventanaBuscar% ;Desactivar INCREMENTAL
     
-    ControlGetText, CodigoIngresado, TcxCustomInnerTextEdit1, ahk_class TFrmBuscar
+    ControlGetText, CodigoIngresado, %campoContenido_Buscar%, %ventanaBuscar%
     if(CodigoIngresado == ""){
         Send, {Esc}
-        WinWaitClose, ahk_class TFrmBuscar
+        WinWaitClose, %ventanaBuscar%
         return
     }
     
     Send, {Enter}
-    If(WinExist("ahk_class TFrmBuscar")){ ;Puede que ya hayamos apretado Enter nosotros.
+    If(WinExist(ventanaBuscar)){ ;Puede que ya hayamos apretado Enter nosotros.
         Send, {Enter}
     }
-    WinWaitClose, ahk_class TFrmBuscar
+    WinWaitClose, %ventanaBuscar%
 }
 
 ProximoArticulo(){ 
-    if(WinExist("ACTUALIZACION DE ARTICULOS")){
-        ;WinWait, ACTUALIZACION DE ARTICULOS
-        WinMenuSelectItem, ACTUALIZACION DE ARTICULOS, , Buscar, Siguiente ;Modo Modificar.
-        ;ControlSend,,{PGDN}, ACTUALIZACION DE ARTICULOS
+    if(WinExist(ventanaArticulos)){
+        ;WinWait, %ventanaArticulos%
+        WinMenuSelectItem, %ventanaArticulos%, , Buscar, Siguiente ;Modo Modificar.
+        ;ControlSend,,{PGDN}, %ventanaArticulos%
     }
-    if(WinExist("ACTUALIZACION DE PRECIOS INDIVIDUAL POR ARTICULO")){
-        ;WinWait, ACTUALIZACION DE PRECIOS INDIVIDUAL POR ARTICULO
-        WinMenuSelectItem, ACTUALIZACION DE PRECIOS INDIVIDUAL POR ARTICULO, , Buscar, Siguiente
-        ;ControlSend,,{PGDN}, ACTUALIZACION DE PRECIOS INDIVIDUAL POR ARTICULO
+    if(WinExist(ventanaPrecios)){
+        ;WinWait, %ventanaPrecios%
+        WinMenuSelectItem, %ventanaPrecios%, , Buscar, Siguiente
+        ;ControlSend,,{PGDN}, %ventanaPrecios%
     }
 }
 
 AnteriorArticulo(){
-    if(WinExist("ACTUALIZACION DE ARTICULOS")){
-        ControlSend,,{PGUP}, ACTUALIZACION DE ARTICULOS
+    if(WinExist(ventanaArticulos)){
+        ControlSend,,{PGUP}, %ventanaArticulos%
     }
-    if(WinExist("ACTUALIZACION DE PRECIOS INDIVIDUAL POR ARTICULO")){
-        ControlSend,,{PGUP}, ACTUALIZACION DE PRECIOS INDIVIDUAL POR ARTICULO
+    if(WinExist(ventanaPrecios)){
+        ControlSend,,{PGUP}, %ventanaPrecios%
     }
 }
 
 EstilizarVentanas(Activar := 1){
     if(Activar == 1){
-        WinSet, AlwaysOnTop, On, ACTUALIZACION DE ARTICULOS
-        WinSet, Region, 0-0 W572 H222, ACTUALIZACION DE ARTICULOS ;Máscara de 572x222 empezando en 0,0
-        WinMove, ACTUALIZACION DE ARTICULOS, , 1028, 26, 572
-        WinGetPos, X, Y, W, H, ACTUALIZACION DE ARTICULOS
+        WinSet, AlwaysOnTop, On, %ventanaArticulos%
+        WinSet, Region, 0-0 W572 H222, %ventanaArticulos% ;Máscara de 572x222 empezando en 0,0
+        WinMove, %ventanaArticulos%, , 1028, 26, 572
+        WinGetPos, X, Y, W, H, %ventanaArticulos%
         
-        WinSet, AlwaysOnTop, On, ACTUALIZACION DE PRECIOS INDIVIDUAL POR ARTICULO
+        WinSet, AlwaysOnTop, On, %ventanaPrecios%
 
-        WinMove, ACTUALIZACION DE PRECIOS INDIVIDUAL POR ARTICULO, , X, Y+222, W, H
-        WinGetPos, X, Y, W, H, ACTUALIZACION DE PRECIOS INDIVIDUAL POR ARTICULO
+        WinMove, %ventanaPrecios%, , X, Y+222, W, H
+        WinGetPos, X, Y, W, H, %ventanaPrecios%
         
-        if(WinExist("ahk_class Notepad")){
-            WinSet, Region, 0-0 W572 H398, ACTUALIZACION DE PRECIOS INDIVIDUAL POR ARTICULO ;Máscara de 572x425 empezando en 0,0
+        if(WinExist(ventanaNotepad)){
+            WinSet, Region, 0-0 W572 H398, %ventanaPrecios% ;Máscara de 572x425 empezando en 0,0
             
-            WinSet, Region, 0-0 W999 H999, ahk_class Notepad ;Literalmente sólo para que tenga los 3 pixeles negros feos
-            WinSet, AlwaysOnTop, On, ahk_class Notepad
-            WinMove, ahk_class Notepad, , X, Y+398 , W, 125
+            WinSet, Region, 0-0 W999 H999, %ventanaNotepad% ;Literalmente sólo para que tenga los 3 pixeles negros feos
+            WinSet, AlwaysOnTop, On, %ventanaNotepad%
+            WinMove, %ventanaNotepad%, , X, Y+398 , W, 125
         }
         
 
     }
     else{
-        WinSet, AlwaysOnTop, Off, ACTUALIZACION DE ARTICULOS
-        WinSet, Region, , ACTUALIZACION DE ARTICULOS
+        WinSet, AlwaysOnTop, Off, %ventanaArticulos%
+        WinSet, Region, , %ventanaArticulos%
         
-        WinSet, AlwaysOnTop, Off, ACTUALIZACION DE PRECIOS INDIVIDUAL POR ARTICULO
-        WinSet, Region, , ACTUALIZACION DE PRECIOS INDIVIDUAL POR ARTICULO
+        WinSet, AlwaysOnTop, Off, %ventanaPrecios%
+        WinSet, Region, , %ventanaPrecios%
         
-        WinSet, AlwaysOnTop, Off, ahk_class Notepad
-        WinSet, Region, , ahk_class Notepad
+        WinSet, AlwaysOnTop, Off, %ventanaNotepad%
+        WinSet, Region, , %ventanaNotepad%
     }
 }
 
@@ -245,7 +257,7 @@ LogPriceChange(itemID := "", oldPrice := "", newPrice = ""){
     percent := (100*newPrice/oldPrice)-100
     percent := Round(percent, 1)
     finalText = %itemID%: %oldPrice% -> %newPrice% (%percent%`%)`r`n
-    Control, EditPaste, %finalText%, , ahk_class Notepad
+    Control, EditPaste, %finalText%, , %ventanaNotepad%
 }
 
 Launch_Media::
