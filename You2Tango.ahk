@@ -39,12 +39,12 @@ PegarPrecio98o99(mult:=1){
     }
     
     WinMenuSelectItem, ACTUALIZACION DE PRECIOS INDIVIDUAL POR ARTICULO, , Modificar
-    WinWait, ACTUALIZACION DE ARTICULOS
+    WinWait, ACTUALIZACION DE PRECIOS INDIVIDUAL POR ARTICULO
     if(PicExists("Images/ActualizacionPrecios/Dolar.png")){
         if(not ClickPic("Images/ActualizacionPrecios/Dolar.png", 425, 5)){
             return
         }
-        WinWait, ACTUALIZACION DE ARTICULOS
+        WinWait, ACTUALIZACION DE PRECIOS INDIVIDUAL POR ARTICULO
         if(not ClickPic("Images/ActualizacionPrecios/Dolar_Seleccionado.png", 425, 5)){
             return
         }
@@ -53,13 +53,21 @@ PegarPrecio98o99(mult:=1){
         if(not ClickPic("Images/ActualizacionPrecios/NoUsarUsoInterno.png", 425, 5)){
             return
         }
-        WinWait, ACTUALIZACION DE ARTICULOS
+        WinWait, ACTUALIZACION DE PRECIOS INDIVIDUAL POR ARTICULO
         if(not ClickPic("Images/ActualizacionPrecios/NoUsarUsoInterno_Seleccionado.png", 425, 5)){
             return
         }
     }
-    WinWait, ACTUALIZACION DE ARTICULOS
+    WinWait, ACTUALIZACION DE PRECIOS INDIVIDUAL POR ARTICULO
+    
+    ControlGetText, itemID, TEdit6, ACTUALIZACION DE PRECIOS INDIVIDUAL POR ARTICULO
+    ControlGetText, oldPrice, TNumEditTg1, ACTUALIZACION DE PRECIOS INDIVIDUAL POR ARTICULO
+    LogPriceChange(itemID, oldPrice, multiplied)
+    
     Send, %multiplied%
+    Send, {F10}
+    Sleep, 150
+    Send, {F10}
 }
 
 ActualizarDescripFecha(doAfter:="", replacement:=""){
@@ -216,6 +224,13 @@ EstilizarVentanas(Activar := 1){
     }
 }
 
+LogPriceChange(itemID := "", oldPrice := "", newPrice = ""){
+    percent := (100*newPrice/oldPrice)-100
+    percent := Round(percent, 1)
+    finalText = %itemID%: %oldPrice% -> %newPrice% (%percent%`%)`r`n
+    Control, EditPaste, %finalText%, , ahk_class Notepad
+}
+
 Launch_Media::
 MsgBox, Testing...
 return
@@ -265,11 +280,11 @@ BuscarPorPortapapel()
 return
 
 Browser_Home::
-PegarPrecio98o99(1.16)
+PegarPrecio98o99(1.21)
 return
 
 ^Browser_Home::
-PegarPrecio98o99(1.04975)
+PegarPrecio98o99(1.21/45)
 return
 
 #IfWinActive SOS DE STOCK ; Works for EGRESOS and INGRESOS. AHK does not have an OR operand for this command.
