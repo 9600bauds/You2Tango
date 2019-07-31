@@ -127,7 +127,7 @@ BuscarPorPortapapel(){
         Sleep, 100
         Send, ^v{Enter} ;Ctrl+V+Enter
         Sleep, 100
-        if(PicExists("Images/OpenOfficeCalc/EndOfSheet.png")){ ;Damn you, OpenOffice.
+        if(PicExists("Images/OpenOfficeCalc/EndOf.png")){ ;Damn you, OpenOffice.
             Send, {Enter}
         }
     }
@@ -210,17 +210,34 @@ AnteriorArticulo(){
 EstilizarVentanas(Activar := 1){
     if(Activar == 1){
         WinSet, AlwaysOnTop, On, ACTUALIZACION DE ARTICULOS
-        WinSet, Region, 0-0 W572 H222 R11-11, ACTUALIZACION DE ARTICULOS ;Máscara de 572x222 empezando en 0,0 con bordes suaves de 11 pixeles.
+        WinSet, Region, 0-0 W572 H222, ACTUALIZACION DE ARTICULOS ;Máscara de 572x222 empezando en 0,0
+        WinMove, ACTUALIZACION DE ARTICULOS, , 1028, 26, 572
+        WinGetPos, X, Y, W, H, ACTUALIZACION DE ARTICULOS
         
         WinSet, AlwaysOnTop, On, ACTUALIZACION DE PRECIOS INDIVIDUAL POR ARTICULO
-        WinGetPos, X, Y, , , ACTUALIZACION DE ARTICULOS
-        WinMove, ACTUALIZACION DE PRECIOS INDIVIDUAL POR ARTICULO, , X, Y+222
+
+        WinMove, ACTUALIZACION DE PRECIOS INDIVIDUAL POR ARTICULO, , X, Y+222, W, H
+        WinGetPos, X, Y, W, H, ACTUALIZACION DE PRECIOS INDIVIDUAL POR ARTICULO
+        
+        if(WinExist("ahk_class Notepad")){
+            WinSet, Region, 0-0 W572 H398, ACTUALIZACION DE PRECIOS INDIVIDUAL POR ARTICULO ;Máscara de 572x425 empezando en 0,0
+            
+            WinSet, Region, 0-0 W999 H999, ahk_class Notepad ;Literalmente sólo para que tenga los 3 pixeles negros feos
+            WinSet, AlwaysOnTop, On, ahk_class Notepad
+            WinMove, ahk_class Notepad, , X, Y+398 , W, 125
+        }
+        
+
     }
     else{
         WinSet, AlwaysOnTop, Off, ACTUALIZACION DE ARTICULOS
         WinSet, Region, , ACTUALIZACION DE ARTICULOS
         
         WinSet, AlwaysOnTop, Off, ACTUALIZACION DE PRECIOS INDIVIDUAL POR ARTICULO
+        WinSet, Region, , ACTUALIZACION DE PRECIOS INDIVIDUAL POR ARTICULO
+        
+        WinSet, AlwaysOnTop, Off, ahk_class Notepad
+        WinSet, Region, , ahk_class Notepad
     }
 }
 
