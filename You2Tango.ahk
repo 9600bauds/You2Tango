@@ -79,13 +79,14 @@ PegarPrecio98o99(mult:=1){
     percent := (100*multiplied/oldPrice)-100
     percent := Round(percent, 1)
     if(percent < -15 or percent > 20)
-        MsgBox, 4, , Diferencia de %percent%`%, continuar?
-        IfMsgBox No
+        MsgBox, 305, , Diferencia de %percent%`%, continuar? ;1+48+256
+        IfMsgBox, Cancel
+        {
             Send, {Esc}
             Sleep, 150
             Send, {F10}
             return
-    
+        }
     LogPriceChange(itemID, oldPrice, multiplied)
     
     Send, %multiplied%
