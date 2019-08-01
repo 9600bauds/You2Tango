@@ -75,6 +75,17 @@ PegarPrecio98o99(mult:=1){
     
     ControlGetText, itemID, %campoCodigoArt_Precios%, %ventanaPrecios%
     ControlGetText, oldPrice, %campoPrecioActual%, %ventanaPrecios%
+    
+    percent := (100*multiplied/oldPrice)-100
+    percent := Round(percent, 1)
+    if(percent < -15 or percent > 20)
+        MsgBox, 4, , Diferencia de %percent%`%, continuar?
+        IfMsgBox No
+            Send, {Esc}
+            Sleep, 150
+            Send, {F10}
+            return
+    
     LogPriceChange(itemID, oldPrice, multiplied)
     
     Send, %multiplied%
