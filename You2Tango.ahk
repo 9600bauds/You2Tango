@@ -11,6 +11,7 @@ global ventanaArticulos := "ACTUALIZACION DE ARTICULOS"
 global campoMedidaVentas := "TEdit4"
 global campoCodigoArt_Articulos := "TEdit11"
 global campoDescAdicional := "TEdit8"
+global campoDesc_Articulos := "TEdit9"
 
 global ventanaPrecios := "ACTUALIZACION DE PRECIOS INDIVIDUAL POR ARTICULO"
 global campoCodigoArt_Precios := "TEdit6"
@@ -119,6 +120,47 @@ ActualizarDescripFecha(doAfter:="", replacement:=""){
     WinWait, %ventanaArticulos%
     ControlFocus, %campoDescAdicional%, %ventanaArticulos% ;Si no hacemos focus, Tango no detecta que hicimos algún cambio.
     ControlSetText, %campoDescAdicional%, %replacement%, %ventanaArticulos%
+    WinWait, %ventanaArticulos%
+    Send, {F10}
+    Sleep, 150
+    Send, {F10}
+    Sleep, 150
+    Send, {F10}
+    
+    if(doAfter == "search"){
+        Sleep, 150
+        WinMenuSelectItem, %ventanaArticulos%, , Buscar, Por Clave
+    }
+    else if(doAfter == "next"){
+        Sleep, 150
+        ProximoArticulo()
+    }
+}
+
+EliminacionArticulo(doAfter:=""){
+    if(not WinExist(ventanaArticulos)){
+        MsgBox No existe %ventanaArticulos%.
+        return
+    }
+    
+    if(WinExist(ventanaBuscar)){
+        CerrarVentanaBuscar()
+    }
+    
+    If(!IsAlwaysOnTop(ventanaArticulos)){
+        WinActivate, %ventanaArticulos%
+        WinWait, %ventanaArticulos%
+    }
+    
+    ControlGetText, Clipboard, %campoDesc_Articulos%, %ventanaArticulos% ;Copiamos al portapapeles, por si accidentalmente borramos un artículo equivocado.
+    
+    ControlGetText, itemID, %campoCodigoArt_Articulos%, %ventanaArticulos%
+    LogArticleDeletion(itemID)
+
+    WinMenuSelectItem, %ventanaArticulos%, , Modificar
+    WinWait, %ventanaArticulos%
+    ControlFocus, %campoDesc_Articulos%, %ventanaArticulos% ;Si no hacemos focus, Tango no detecta que hicimos algún cambio.
+    ControlSetText, %campoDesc_Articulos%, ZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ, %ventanaArticulos%
     WinWait, %ventanaArticulos%
     Send, {F10}
     Sleep, 150
@@ -269,6 +311,11 @@ LogPriceChange(itemID := "", oldPrice := "", newPrice = ""){
     percent := (100*newPrice/oldPrice)-100
     percent := Round(percent, 1)
     finalText = %itemID%: %oldPrice% -> %newPrice% (%percent%`%)`r`n
+    Control, EditPaste, %finalText%, , %ventanaNotepad%
+}
+
+LogArticleDeletion(itemID := ""){
+    finalText = Eliminación: %itemID%`r`n
     Control, EditPaste, %finalText%, , %ventanaNotepad%
 }
 
