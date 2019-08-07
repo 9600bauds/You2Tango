@@ -24,6 +24,9 @@ global checkboxIncremental := "TCheckBox3"
 
 global ventanaNotepad := "ahk_class Notepad"
 
+global multiplicadorPrecio1 := 1
+global multiplicadorPrecio2 := 1.21
+
 CopiarUnidadMedidaVentas(){
     if(not WinExist(ventanaArticulos)){
         MsgBox No existe %ventanaArticulos%.
@@ -31,6 +34,26 @@ CopiarUnidadMedidaVentas(){
     }
 
     ControlGetText, Clipboard, %campoMedidaVentas%, %ventanaArticulos%
+}
+
+IngresarMultiplicadoresPrecio(){
+    explanation := "Ingrese el descuento con el siguiente formato:`n1.21 para +21`%`n0.8 para -20`%"
+    newMultiplier := 0
+    InputBox, newMultiplier, Descuento Básico, %explanation%,,,,,,,,%multiplicadorPrecio1%
+    if(IsNum(newMultiplier)) {
+        multiplicadorPrecio1 := newMultiplier
+    }
+    else{
+        MsgBox, No se ingresó un número.
+    }
+    
+    InputBox, newMultiplier, Descuento Alternativo, %explanation%,,,,,,,,%multiplicadorPrecio2%
+    if(IsNum(newMultiplier)) {
+        multiplicadorPrecio2 := newMultiplier
+    }
+    else{
+        MsgBox, No se ingresó un número.
+    }
 }
 
 PegarPrecio98o99(mult:=1){
@@ -333,7 +356,9 @@ Volume_Down::
 EstilizarVentanas(0)
 return
 
-;Volume_Mute::
+Volume_Mute::
+IngresarMultiplicadoresPrecio()
+return
 
 Media_Play_Pause::
 ActualizarDescripFecha("search")
@@ -370,11 +395,11 @@ BuscarPorPortapapel()
 return
 
 Browser_Home::
-PegarPrecio98o99(1.21)
+PegarPrecio98o99(multiplicadorPrecio1)
 return
 
 ^Browser_Home::
-PegarPrecio98o99(1.21/45)
+PegarPrecio98o99(multiplicadorPrecio2)
 return
 
 #IfWinActive SOS DE STOCK ; Works for EGRESOS and INGRESOS. AHK does not have an OR operand for this command.
