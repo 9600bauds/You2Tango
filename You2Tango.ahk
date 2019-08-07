@@ -19,6 +19,8 @@ global campoPrecioActual := "TNumEditTg1"
 
 global ventanaBuscar := "ahk_class TFrmBuscar"
 global campoContenido_Buscar := "TcxCustomInnerTextEdit1"
+global checkboxFiltrar := "TCheckBox4"
+global checkboxIncremental := "TCheckBox3"
 
 global ventanaNotepad := "ahk_class Notepad"
 
@@ -234,8 +236,8 @@ CerrarVentanaBuscar(){
     }
     WinActivate, %ventanaBuscar%
     
-    Control, Check, , TCheckBox4, %ventanaBuscar% ;Activar FILTRAR
-    Control, Uncheck, , TCheckBox3, %ventanaBuscar% ;Desactivar INCREMENTAL
+    Control, Check, , %checkboxFiltrar%, %ventanaBuscar%
+    Control, Uncheck, , %checkboxIncremental%, %ventanaBuscar%
     
     ControlGetText, CodigoIngresado, %campoContenido_Buscar%, %ventanaBuscar%
     if(CodigoIngresado == ""){
@@ -378,6 +380,6 @@ return
 #IfWinActive SOS DE STOCK ; Works for EGRESOS and INGRESOS. AHK does not have an OR operand for this command.
 ::cdm::Cambio de Mercadería - Blas
 ::cds::Corrección de Stock - Blas
-::mui::Uso Interno - Blas
+::mui::Roto/Uso Interno - Blas
 ::-b:: - Blas
 #IfWinActive
