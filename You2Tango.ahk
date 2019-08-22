@@ -140,12 +140,17 @@ ActualizarDescripFecha(doAfter:="", replacement:=""){
         WinWait, %ventanaArticulos%
     }
     
+    ControlGetText, oldDesc, %campoDescAdicional%, %ventanaArticulos% ;Para el logging.
+    ControlGetText, itemID, %campoCodigoArt_Articulos%, %ventanaArticulos% ;Para el logging.
     ControlGetText, Clipboard, %campoDescAdicional%, %ventanaArticulos% ;Copiamos al portapapeles, por si accidentalmente sobreescribimos la descripción de un artículo equivocado.
+    
     WinMenuSelectItem, %ventanaArticulos%, , Modificar
     WinWait, %ventanaArticulos%
     ControlFocus, %campoDescAdicional%, %ventanaArticulos% ;Si no hacemos focus, Tango no detecta que hicimos algún cambio.
     ControlSetText, %campoDescAdicional%, %replacement%, %ventanaArticulos%
     WinWait, %ventanaArticulos%
+    
+    LogDescChange(itemID, oldDesc, replacement)
     Send, {F10}
     Sleep, 150
     Send, {F10}
@@ -336,11 +341,20 @@ LogPriceChange(itemID := "", oldPrice := "", newPrice = ""){
     percent := (100*newPrice/oldPrice)-100
     percent := Round(percent, 1)
     finalText = %itemID%: %oldPrice% -> %newPrice% (%percent%`%)`r`n
-    Control, EditPaste, %finalText%, , %ventanaNotepad%
+    LogSend(finalText)
 }
 
 LogArticleDeletion(itemID := ""){
     finalText = Eliminación: %itemID%`r`n
+    LogSend(finalText)
+}
+
+LogDescChange(itemID := "", oldDesc := "", newDesc = ""){
+    finalText = %itemID%: %oldDesc% -> %newDesc%`r`n
+    LogSend(finalText)
+}
+
+LogSend(finalText := ""){
     Control, EditPaste, %finalText%, , %ventanaNotepad%
 }
 
