@@ -140,8 +140,8 @@ ActualizarDescripFecha(doAfter:="", replacement:=""){
         WinWait, %ventanaArticulos%
     }
     
-    ControlGetText, oldDesc, %campoDescAdicional%, %ventanaArticulos% ;Para el logging.
     ControlGetText, itemID, %campoCodigoArt_Articulos%, %ventanaArticulos% ;Para el logging.
+    ControlGetText, oldDesc, %campoDescAdicional%, %ventanaArticulos% ;Para el logging.
     ControlGetText, Clipboard, %campoDescAdicional%, %ventanaArticulos% ;Copiamos al portapapeles, por si accidentalmente sobreescribimos la descripción de un artículo equivocado.
     
     WinMenuSelectItem, %ventanaArticulos%, , Modificar
@@ -182,9 +182,10 @@ EliminacionArticulo(doAfter:=""){
         WinWait, %ventanaArticulos%
     }
     
+    ControlGetText, itemID, %campoCodigoArt_Articulos%, %ventanaArticulos% ;Para el logging
+    ControlGetText, oldDesc, %campoDescAdicional%, %ventanaArticulos% ;Para el logging.
     ControlGetText, Clipboard, %campoDesc_Articulos%, %ventanaArticulos% ;Copiamos al portapapeles, por si accidentalmente borramos un artículo equivocado.
     
-    ControlGetText, itemID, %campoCodigoArt_Articulos%, %ventanaArticulos%
     LogArticleDeletion(itemID)
 
     WinMenuSelectItem, %ventanaArticulos%, , Modificar
@@ -344,8 +345,8 @@ LogPriceChange(itemID := "", oldPrice := "", newPrice = ""){
     LogSend(finalText)
 }
 
-LogArticleDeletion(itemID := ""){
-    finalText = Eliminación: %itemID%`r`n
+LogArticleDeletion(itemID := "", oldDesc := ""){
+    finalText = Eliminación: %itemID% (%oldDesc%)`r`n
     LogSend(finalText)
 }
 
