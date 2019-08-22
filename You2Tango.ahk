@@ -167,6 +167,28 @@ ActualizarDescripFecha(doAfter:="", replacement:=""){
     }
 }
 
+MassActualizarDesc(){
+    arr = 1578,2134,3758,5638,6544,500,2886
+    
+    if(not WinExist(ventanaArticulos)){
+        MsgBox No existe %ventanaArticulos%.
+        return
+    }
+    
+    if(not WinExist(ventanaBuscar)){
+        WinMenuSelectItem, %ventanaArticulos%, , Buscar, Por Clave
+    }
+    
+    
+    Loop, parse, arr, `,,
+    {
+        ActualizarDescripFecha("search")
+        Sleep, 250
+        Send, %A_LoopField%
+    }
+    ActualizarDescripFecha("search")
+}
+
 EliminacionArticulo(doAfter:=""){
     if(not WinExist(ventanaArticulos)){
         MsgBox No existe %ventanaArticulos%.
