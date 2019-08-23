@@ -104,7 +104,7 @@ PegarPrecio98o99(mult:=1){
     
     percent := (100*multiplied/oldPrice)-100
     percent := Round(percent, 1)
-    if(percent < -15 or percent > 20)
+    if(percent < -15 or percent > 20){
         MsgBox, 305, , Diferencia de %percent%`%, continuar? ;1+48+256
         IfMsgBox, Cancel
         {
@@ -113,6 +113,7 @@ PegarPrecio98o99(mult:=1){
             Send, {F10}
             return
         }
+    }
     LogPriceChange(itemID, oldPrice, multiplied)
     
     Send, %multiplied%
@@ -121,41 +122,20 @@ PegarPrecio98o99(mult:=1){
     Send, {F10}
 }
 
-ActualizarDescripFecha(doAfter:="", replacement:=""){
-    if(not WinExist(ventanaArticulos)){
-        MsgBox No existe %ventanaArticulos%.
-        return
-    }
-    
+ActualizarDescripFecha(doAfter:="", replacement:=""){   
     if(replacement == ""){
         FormatTime, replacement, , MM/yyyy
     }
-    
-    if(WinExist(ventanaBuscar)){
-        CerrarVentanaBuscar()
-    }
-    
-    If(!IsAlwaysOnTop(ventanaArticulos)){
-        WinActivate, %ventanaArticulos%
-        WinWait, %ventanaArticulos%
-    }
-    
+        
     ControlGetText, itemID, %campoCodigoArt_Articulos%, %ventanaArticulos% ;Para el logging.
     ControlGetText, oldDesc, %campoDescAdicional%, %ventanaArticulos% ;Para el logging.
     ControlGetText, Clipboard, %campoDescAdicional%, %ventanaArticulos% ;Copiamos al portapapeles, por si accidentalmente sobreescribimos la descripción de un artículo equivocado.
     
-    WinMenuSelectItem, %ventanaArticulos%, , Modificar
-    WinWait, %ventanaArticulos%
-    ControlFocus, %campoDescAdicional%, %ventanaArticulos% ;Si no hacemos focus, Tango no detecta que hicimos algún cambio.
-    ControlSetText, %campoDescAdicional%, %replacement%, %ventanaArticulos%
-    WinWait, %ventanaArticulos%
+    if(not CambiarCampoVentanaArticulos(campoDescAdicional, replacement)){
+        return false
+    }
     
     LogDescChange(itemID, oldDesc, replacement)
-    Send, {F10}
-    Sleep, 150
-    Send, {F10}
-    Sleep, 150
-    Send, {F10}
     
     if(doAfter == "search"){
         Sleep, 150
@@ -177,8 +157,8 @@ MassActualizarDesc(){
     
     if(not WinExist(ventanaBuscar)){
         WinMenuSelectItem, %ventanaArticulos%, , Buscar, Por Clave
+        WinWait, %ventanaBuscar%
     }
-    
     
     Loop, parse, arr, `,,
     {
@@ -186,13 +166,34 @@ MassActualizarDesc(){
         Sleep, 250
         Send, %A_LoopField%
     }
-    ActualizarDescripFecha("search")
+    ActualizarDescripFecha()
 }
 
-EliminacionArticulo(doAfter:=""){
+EliminacionArticulo(doAfter:=""){    
+    ControlGetText, itemID, %campoCodigoArt_Articulos%, %ventanaArticulos% ;Para el logging
+    ControlGetText, oldDesc, %campoDescAdicional%, %ventanaArticulos% ;Para el logging.
+    ControlGetText, Clipboard, %campoDesc_Articulos%, %ventanaArticulos% ;Copiamos al portapapeles, por si accidentalmente borramos un artículo equivocado.
+    
+    if(not CambiarCampoVentanaArticulos(campoDesc_Articulos, "ZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ")){
+        return false
+    }
+    
+    LogArticleDeletion(itemID, oldDesc)
+       
+    if(doAfter == "search"){
+        Sleep, 150
+        WinMenuSelectItem, %ventanaArticulos%, , Buscar, Por Clave
+    }
+    else if(doAfter == "next"){
+        Sleep, 150
+        ProximoArticulo()
+    }
+}
+
+CambiarCampoVentanaArticulos(field := "", newText = ""){
     if(not WinExist(ventanaArticulos)){
         MsgBox No existe %ventanaArticulos%.
-        return
+        return false
     }
     
     if(WinExist(ventanaBuscar)){
@@ -204,16 +205,10 @@ EliminacionArticulo(doAfter:=""){
         WinWait, %ventanaArticulos%
     }
     
-    ControlGetText, itemID, %campoCodigoArt_Articulos%, %ventanaArticulos% ;Para el logging
-    ControlGetText, oldDesc, %campoDescAdicional%, %ventanaArticulos% ;Para el logging.
-    ControlGetText, Clipboard, %campoDesc_Articulos%, %ventanaArticulos% ;Copiamos al portapapeles, por si accidentalmente borramos un artículo equivocado.
-    
-    LogArticleDeletion(itemID)
-
     WinMenuSelectItem, %ventanaArticulos%, , Modificar
     WinWait, %ventanaArticulos%
-    ControlFocus, %campoDesc_Articulos%, %ventanaArticulos% ;Si no hacemos focus, Tango no detecta que hicimos algún cambio.
-    ControlSetText, %campoDesc_Articulos%, ZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ, %ventanaArticulos%
+    ControlFocus, %field%, %ventanaArticulos% ;Si no hacemos focus, Tango no detecta que hicimos algún cambio.
+    ControlSetText, %field%, %newText%, %ventanaArticulos%
     WinWait, %ventanaArticulos%
     Send, {F10}
     Sleep, 150
@@ -221,14 +216,7 @@ EliminacionArticulo(doAfter:=""){
     Sleep, 150
     Send, {F10}
     
-    if(doAfter == "search"){
-        Sleep, 150
-        WinMenuSelectItem, %ventanaArticulos%, , Buscar, Por Clave
-    }
-    else if(doAfter == "next"){
-        Sleep, 150
-        ProximoArticulo()
-    }
+    return true
 }
 
 BuscarPorPortapapel(){
