@@ -24,8 +24,8 @@ global checkboxIncremental := "TCheckBox3"
 
 global ventanaNotepad := "ahk_class Notepad"
 
-global multiplicadorPrecio1 := 1
-global multiplicadorPrecio2 := 1.21
+global multiplicadorPrecio1 := 1.21
+global multiplicadorPrecio2 := 1
 
 CopiarUnidadMedidaVentas(){
     if(not WinExist(ventanaArticulos)){
