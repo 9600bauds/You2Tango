@@ -366,6 +366,7 @@ LogDescChange(itemID := "", oldDesc := "", newDesc = ""){
 }
 
 LogSend(finalText := ""){
+    ControlSend,,^{End}, %ventanaNotepad% ;Ctrl+End: Go to end of document
     Control, EditPaste, %finalText%, , %ventanaNotepad%
 }
 
