@@ -27,6 +27,17 @@ global ventanaNotepad := "ahk_class Notepad"
 global multiplicadorPrecio1 := 1.21
 global multiplicadorPrecio2 := 1
 
+IsNum( str ) { ;Fuck AHK.
+	if str is number
+		return true
+	return false
+}
+
+IsAlwaysOnTop( Window ) {
+    WinGet, Estilo, ExStyle, %Window%
+    Return (Estilo & 0x8) ; 0x8 is WS_EX_TOPMOST.
+}
+
 CopiarUnidadMedidaVentas(){
     if(not WinExist(ventanaArticulos)){
         MsgBox No existe %ventanaArticulos%.

@@ -48,14 +48,3 @@ WaitNotPic(filename, interval:=100, tries:=25) {
     }
     return 0
 }
-
-IsNum( str ) { ;Fuck AHK.
-	if str is number
-		return true
-	return false
-}
-
-IsAlwaysOnTop( Window ) {
-    WinGet, Estilo, ExStyle, %Window%
-    Return (Estilo & 0x8) ; 0x8 is WS_EX_TOPMOST.
-}
