@@ -57,6 +57,10 @@ IngresarMultiplicadoresPrecio(){
 }
 
 PegarPrecio98o99(mult:=1){
+    if(not SeleccionarPrecio98o99()){
+        return false
+    }
+    
     Clipboard := RegExReplace(Clipboard, ",", ".") ;Reemplazar comas por puntos.
     Clipboard := RegExReplace(Clipboard, "\.(?![^.]+$)")  ;Quitar todos los puntos excepto el último.
     Clipboard := RegExReplace(Clipboard, "[^0-9.]") ;Eliminar todo excepto números y puntos.
@@ -66,38 +70,6 @@ PegarPrecio98o99(mult:=1){
     }
     multiplied := (Clipboard * mult)
     multiplied = % Round(multiplied, 2) ;Tango sólo quiere 2 decimales.
-   
-    if(not WinExist(ventanaPrecios)){
-        MsgBox No existe %ventanaPrecios%.
-        return
-    }
-    
-    If(!IsAlwaysOnTop(ventanaPrecios)){
-        WinActivate, %ventanaPrecios%
-        WinWait, %ventanaPrecios%
-    }
-    
-    WinMenuSelectItem, %ventanaPrecios%, , Modificar
-    WinWait, %ventanaPrecios%
-    if(PicExists("Images/ActualizacionPrecios/Dolar.png")){
-        if(not ClickPic("Images/ActualizacionPrecios/Dolar.png", 425, 5)){
-            return
-        }
-        WinWait, %ventanaPrecios%
-        if(not ClickPic("Images/ActualizacionPrecios/Dolar_Seleccionado.png", 425, 5)){
-            return
-        }
-    }
-    else{
-        if(not ClickPic("Images/ActualizacionPrecios/NoUsarUsoInterno.png", 425, 5)){
-            return
-        }
-        WinWait, %ventanaPrecios%
-        if(not ClickPic("Images/ActualizacionPrecios/NoUsarUsoInterno_Seleccionado.png", 425, 5)){
-            return
-        }
-    }
-    WinWait, %ventanaPrecios%
     
     ControlGetText, itemID, %campoCodigoArt_Precios%, %ventanaPrecios%
     ControlGetText, oldPrice, %campoPrecioActual%, %ventanaPrecios%
@@ -120,6 +92,69 @@ PegarPrecio98o99(mult:=1){
     Send, {F10}
     Sleep, 150
     Send, {F10}
+}
+
+MultiplicarPrecio98o99(mult:=0){
+    if(mult == 0){
+        explanation := "Ingrese el porcentaje a añadir o restar con el siguiente formato:`n1.21 para +21`%`n0.8 para -20`%"
+        InputBox, mult, Porcentaje, %explanation%,,,,,,,,%mult%
+        if(!IsNum(mult)) {
+            MsgBox, No se ingresó un número.
+            return
+        }
+        ;todo: big "+20%" number to multiplier
+    }
+    
+    if(not SeleccionarPrecio98o99()){
+        return false
+    }
+    
+    ControlGetText, itemID, %campoCodigoArt_Precios%, %ventanaPrecios%
+    ControlGetText, oldPrice, %campoPrecioActual%, %ventanaPrecios%
+    multiplied := oldPrice*mult
+    multiplied = % Round(multiplied, 2) ;Tango sólo quiere 2 decimales.
+    
+    LogPriceChange(itemID, oldPrice, multiplied)
+    ControlSetText, %campoPrecioActual%, %multiplied%, %ventanaPrecios%
+    Send, {F10}
+    Sleep, 150
+    Send, {F10}
+}
+
+SeleccionarPrecio98o99(){
+    if(not WinExist(ventanaPrecios)){
+        MsgBox No existe %ventanaPrecios%.
+        return false
+    }
+    
+    If(!IsAlwaysOnTop(ventanaPrecios)){
+        WinActivate, %ventanaPrecios%
+        WinWait, %ventanaPrecios%
+    }
+    
+    WinMenuSelectItem, %ventanaPrecios%, , Modificar
+    WinWait, %ventanaPrecios%
+    if(PicExists("Images/ActualizacionPrecios/Dolar.png")){
+        if(not ClickPic("Images/ActualizacionPrecios/Dolar.png", 425, 5)){
+            return false
+        }
+        WinWait, %ventanaPrecios%
+        if(not ClickPic("Images/ActualizacionPrecios/Dolar_Seleccionado.png", 425, 5)){
+            return false
+        }
+    }
+    else{
+        if(not ClickPic("Images/ActualizacionPrecios/NoUsarUsoInterno.png", 425, 5)){
+            return false
+        }
+        WinWait, %ventanaPrecios%
+        if(not ClickPic("Images/ActualizacionPrecios/NoUsarUsoInterno_Seleccionado.png", 425, 5)){
+            return false
+        }
+    }
+    WinWait, %ventanaPrecios%
+    
+    return true
 }
 
 ActualizarDescripFecha(doAfter:="", replacement:=""){   
