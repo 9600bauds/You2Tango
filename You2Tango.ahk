@@ -7,6 +7,7 @@ SendMode Input  ; Recommended for new scripts due to its superior speed and reli
 SetWorkingDir %A_ScriptDir%  ; Ensures a consistent starting directory.
 SetTitleMatchMode, 2 ; Match window titles anywhere, not just at the start.
 
+;{ Globals
 global ventanaArticulos := "ACTUALIZACION DE ARTICULOS"
 global campoMedidaVentas := "TEdit4"
 global campoCodigoArt_Articulos := "TEdit11"
@@ -26,6 +27,7 @@ global ventanaNotepad := "ahk_class Notepad"
 
 global multiplicadorPrecio1 := 1.21
 global multiplicadorPrecio2 := 1
+;}
 
 ;{ Ventana Artículos - Helpers
 CopiarUnidadMedidaVentas(){
@@ -434,8 +436,8 @@ IsAlwaysOnTop( Window ) {
 
 Launch_Media::
 ;MultiplicarPrecio98o99()
-EliminacionArticulo()
-;MsgBox, Testing...
+;EliminacionArticulo()
+MsgBox, Testing...
 return
 
 Volume_Up::
