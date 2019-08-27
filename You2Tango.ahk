@@ -109,7 +109,7 @@ MultiplicarPrecio98o99(mult:=0){
     if(mult == 0){
         explanation := "Ingrese el porcentaje a añadir o restar con el siguiente formato:`n1.21 para +21`%`n0.8 para -20`%"
         InputBox, mult, Porcentaje, %explanation%,,,,,,,,%mult%
-        if(!IsNum(mult)) {
+        if(!IsNum(mult) or mult == 0) {
             MsgBox, No se ingresó un número.
             return
         }
