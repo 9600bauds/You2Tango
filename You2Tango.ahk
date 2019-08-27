@@ -27,17 +27,7 @@ global ventanaNotepad := "ahk_class Notepad"
 global multiplicadorPrecio1 := 1.21
 global multiplicadorPrecio2 := 1
 
-IsNum( str ) { ;Fuck AHK.
-	if str is number
-		return true
-	return false
-}
-
-IsAlwaysOnTop( Window ) {
-    WinGet, Estilo, ExStyle, %Window%
-    Return (Estilo & 0x8) ; 0x8 is WS_EX_TOPMOST.
-}
-
+;{ Ventana Artículos - Helpers
 CopiarUnidadMedidaVentas(){
     if(not WinExist(ventanaArticulos)){
         MsgBox No existe %ventanaArticulos%.
@@ -47,6 +37,145 @@ CopiarUnidadMedidaVentas(){
     ControlGetText, Clipboard, %campoMedidaVentas%, %ventanaArticulos%
 }
 
+CambiarCampoVentanaArticulos(field := "", newText = ""){
+    if(not WinExist(ventanaArticulos)){
+        MsgBox No existe %ventanaArticulos%.
+        return false
+    }
+    
+    if(WinExist(ventanaBuscar)){
+        CerrarVentanaBuscar()
+    }
+    
+    If(!IsAlwaysOnTop(ventanaArticulos)){
+        WinActivate, %ventanaArticulos%
+        WinWait, %ventanaArticulos%
+    }
+    
+    WinMenuSelectItem, %ventanaArticulos%, , Modificar
+    WinWait, %ventanaArticulos%
+    ControlFocus, %field%, %ventanaArticulos% ;Si no hacemos focus, Tango no detecta que hicimos algún cambio.
+    ControlSetText, %field%, %newText%, %ventanaArticulos%
+    WinWait, %ventanaArticulos%
+    Send, {F10}
+    Sleep, 150
+    Send, {F10}
+    Sleep, 150
+    Send, {F10}
+    
+    return true
+}
+;}
+
+;{ Ventana Artículos - Funciones
+EliminacionArticulo(doAfter:=""){    
+    ControlGetText, itemID, %campoCodigoArt_Articulos%, %ventanaArticulos% ;Para el logging
+    ControlGetText, oldDesc, %campoDescAdicional%, %ventanaArticulos% ;Para el logging.
+    ControlGetText, Clipboard, %campoDesc_Articulos%, %ventanaArticulos% ;Copiamos al portapapeles, por si accidentalmente borramos un artículo equivocado.
+    
+    if(not CambiarCampoVentanaArticulos(campoDesc_Articulos, "ZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ")){
+        return false
+    }
+    
+    LogArticleDeletion(itemID, oldDesc)
+       
+    if(doAfter == "search"){
+        Sleep, 150
+        WinMenuSelectItem, %ventanaArticulos%, , Buscar, Por Clave
+    }
+    else if(doAfter == "next"){
+        Sleep, 150
+        ProximoArticulo()
+    }
+}
+
+ActualizarDescripFecha(doAfter:="", replacement:=""){   
+    if(replacement == ""){
+        FormatTime, replacement, , MM/yyyy
+    }
+        
+    ControlGetText, itemID, %campoCodigoArt_Articulos%, %ventanaArticulos% ;Para el logging.
+    ControlGetText, oldDesc, %campoDescAdicional%, %ventanaArticulos% ;Para el logging.
+    ControlGetText, Clipboard, %campoDescAdicional%, %ventanaArticulos% ;Copiamos al portapapeles, por si accidentalmente sobreescribimos la descripción de un artículo equivocado.
+    
+    if(not CambiarCampoVentanaArticulos(campoDescAdicional, replacement)){
+        return false
+    }
+    
+    LogDescChange(itemID, oldDesc, replacement)
+    
+    if(doAfter == "search"){
+        Sleep, 150
+        WinMenuSelectItem, %ventanaArticulos%, , Buscar, Por Clave
+    }
+    else if(doAfter == "next"){
+        Sleep, 150
+        ProximoArticulo()
+    }
+}
+
+MassActualizarDesc(){
+    arr = 1578,2134,3758,5638,6544,500,2886
+    
+    if(not WinExist(ventanaArticulos)){
+        MsgBox No existe %ventanaArticulos%.
+        return
+    }
+    
+    if(not WinExist(ventanaBuscar)){
+        WinMenuSelectItem, %ventanaArticulos%, , Buscar, Por Clave
+        WinWait, %ventanaBuscar%
+    }
+    
+    Loop, parse, arr, `,,
+    {
+        ActualizarDescripFecha("search")
+        Sleep, 250
+        Send, %A_LoopField%
+    }
+    ActualizarDescripFecha()
+}
+;}
+
+;{ Ventana Precios - Helpers
+SeleccionarPrecio98o99(){
+    if(not WinExist(ventanaPrecios)){
+        MsgBox No existe %ventanaPrecios%.
+        return false
+    }
+    
+    If(!IsAlwaysOnTop(ventanaPrecios)){
+        WinActivate, %ventanaPrecios%
+        WinWait, %ventanaPrecios%
+    }
+    
+    WinMenuSelectItem, %ventanaPrecios%, , Modificar
+    WinWait, %ventanaPrecios%
+    if(PicExists("Images/ActualizacionPrecios/Dolar.png")){
+        if(not ClickPic("Images/ActualizacionPrecios/Dolar.png", 425, 5)){
+            return false
+        }
+        WinWait, %ventanaPrecios%
+        if(not ClickPic("Images/ActualizacionPrecios/Dolar_Seleccionado.png", 425, 5)){
+            return false
+        }
+    }
+    else{
+        if(not ClickPic("Images/ActualizacionPrecios/NoUsarUsoInterno.png", 425, 5)){
+            return false
+        }
+        WinWait, %ventanaPrecios%
+        if(not ClickPic("Images/ActualizacionPrecios/NoUsarUsoInterno_Seleccionado.png", 425, 5)){
+            return false
+        }
+    }
+    WinWait, %ventanaPrecios%
+    
+    return true
+}
+;}
+
+;{ Ventana Precios - Funciones
 IngresarMultiplicadoresPrecio(){
     explanation := "Ingrese el descuento con el siguiente formato:`n1.21 para +21`%`n0.8 para -20`%"
     newMultiplier := 0
@@ -131,140 +260,54 @@ MultiplicarPrecio98o99(mult:=0){
     Sleep, 150
     Send, {F10}
 }
+;}
 
-SeleccionarPrecio98o99(){
+;{ Navegación
+SincronizarArticulosPrecio(){
     if(not WinExist(ventanaPrecios)){
         MsgBox No existe %ventanaPrecios%.
-        return false
+        return
     }
-    
-    If(!IsAlwaysOnTop(ventanaPrecios)){
-        WinActivate, %ventanaPrecios%
-        WinWait, %ventanaPrecios%
-    }
-    
-    WinMenuSelectItem, %ventanaPrecios%, , Modificar
-    WinWait, %ventanaPrecios%
-    if(PicExists("Images/ActualizacionPrecios/Dolar.png")){
-        if(not ClickPic("Images/ActualizacionPrecios/Dolar.png", 425, 5)){
-            return false
-        }
-        WinWait, %ventanaPrecios%
-        if(not ClickPic("Images/ActualizacionPrecios/Dolar_Seleccionado.png", 425, 5)){
-            return false
-        }
-    }
-    else{
-        if(not ClickPic("Images/ActualizacionPrecios/NoUsarUsoInterno.png", 425, 5)){
-            return false
-        }
-        WinWait, %ventanaPrecios%
-        if(not ClickPic("Images/ActualizacionPrecios/NoUsarUsoInterno_Seleccionado.png", 425, 5)){
-            return false
-        }
-    }
-    WinWait, %ventanaPrecios%
-    
-    return true
-}
-
-ActualizarDescripFecha(doAfter:="", replacement:=""){   
-    if(replacement == ""){
-        FormatTime, replacement, , MM/yyyy
-    }
-        
-    ControlGetText, itemID, %campoCodigoArt_Articulos%, %ventanaArticulos% ;Para el logging.
-    ControlGetText, oldDesc, %campoDescAdicional%, %ventanaArticulos% ;Para el logging.
-    ControlGetText, Clipboard, %campoDescAdicional%, %ventanaArticulos% ;Copiamos al portapapeles, por si accidentalmente sobreescribimos la descripción de un artículo equivocado.
-    
-    if(not CambiarCampoVentanaArticulos(campoDescAdicional, replacement)){
-        return false
-    }
-    
-    LogDescChange(itemID, oldDesc, replacement)
-    
-    if(doAfter == "search"){
-        Sleep, 150
-        WinMenuSelectItem, %ventanaArticulos%, , Buscar, Por Clave
-    }
-    else if(doAfter == "next"){
-        Sleep, 150
-        ProximoArticulo()
-    }
-}
-
-MassActualizarDesc(){
-    arr = 1578,2134,3758,5638,6544,500,2886
-    
     if(not WinExist(ventanaArticulos)){
         MsgBox No existe %ventanaArticulos%.
         return
     }
-    
-    if(not WinExist(ventanaBuscar)){
-        WinMenuSelectItem, %ventanaArticulos%, , Buscar, Por Clave
-        WinWait, %ventanaBuscar%
-    }
-    
-    Loop, parse, arr, `,,
-    {
-        ActualizarDescripFecha("search")
-        Sleep, 250
-        Send, %A_LoopField%
-    }
-    ActualizarDescripFecha()
-}
-
-EliminacionArticulo(doAfter:=""){    
-    ControlGetText, itemID, %campoCodigoArt_Articulos%, %ventanaArticulos% ;Para el logging
-    ControlGetText, oldDesc, %campoDescAdicional%, %ventanaArticulos% ;Para el logging.
-    ControlGetText, Clipboard, %campoDesc_Articulos%, %ventanaArticulos% ;Copiamos al portapapeles, por si accidentalmente borramos un artículo equivocado.
-    
-    if(not CambiarCampoVentanaArticulos(campoDesc_Articulos, "ZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ")){
-        return false
-    }
-    
-    LogArticleDeletion(itemID, oldDesc)
-       
-    if(doAfter == "search"){
-        Sleep, 150
-        WinMenuSelectItem, %ventanaArticulos%, , Buscar, Por Clave
-    }
-    else if(doAfter == "next"){
-        Sleep, 150
-        ProximoArticulo()
-    }
-}
-
-CambiarCampoVentanaArticulos(field := "", newText = ""){
-    if(not WinExist(ventanaArticulos)){
-        MsgBox No existe %ventanaArticulos%.
-        return false
-    }
-    
     if(WinExist(ventanaBuscar)){
         CerrarVentanaBuscar()
     }
+
+    ControlGetText, CodigoArticulo, %campoCodigoArt_Articulos%, %ventanaArticulos%
+    WinMenuSelectItem, %ventanaPrecios%, , Buscar, Por Clave
+    WinWait, %ventanaBuscar% ;Ésta es la ventana Buscar.
+    ControlSend, %campoContenido_Buscar%, %CodigoArticulo%, %ventanaBuscar% 
     
-    If(!IsAlwaysOnTop(ventanaArticulos)){
-        WinActivate, %ventanaArticulos%
-        WinWait, %ventanaArticulos%
-    }
-    
-    WinMenuSelectItem, %ventanaArticulos%, , Modificar
-    WinWait, %ventanaArticulos%
-    ControlFocus, %field%, %ventanaArticulos% ;Si no hacemos focus, Tango no detecta que hicimos algún cambio.
-    ControlSetText, %field%, %newText%, %ventanaArticulos%
-    WinWait, %ventanaArticulos%
-    Send, {F10}
-    Sleep, 150
-    Send, {F10}
-    Sleep, 150
-    Send, {F10}
-    
-    return true
+    CerrarVentanaBuscar()
 }
 
+ProximoArticulo(){ 
+    if(WinExist(ventanaArticulos)){
+        ;WinWait, %ventanaArticulos%
+        WinMenuSelectItem, %ventanaArticulos%, , Buscar, Siguiente ;Modo Modificar.
+        ;ControlSend,,{PGDN}, %ventanaArticulos%
+    }
+    if(WinExist(ventanaPrecios)){
+        ;WinWait, %ventanaPrecios%
+        WinMenuSelectItem, %ventanaPrecios%, , Buscar, Siguiente
+        ;ControlSend,,{PGDN}, %ventanaPrecios%
+    }
+}
+
+AnteriorArticulo(){
+    if(WinExist(ventanaArticulos)){
+        ControlSend,,{PGUP}, %ventanaArticulos%
+    }
+    if(WinExist(ventanaPrecios)){
+        ControlSend,,{PGUP}, %ventanaPrecios%
+    }
+}
+;}
+
+;{ Ventana Buscar
 BuscarPorPortapapel(){
     if WinExist("OpenOffice Calc"){
         WinActivate, OpenOffice Calc
@@ -293,27 +336,6 @@ BuscarPorPortapapel(){
     }
 }
 
-SincronizarArticulosPrecio(){
-    if(not WinExist(ventanaPrecios)){
-        MsgBox No existe %ventanaPrecios%.
-        return
-    }
-    if(not WinExist(ventanaArticulos)){
-        MsgBox No existe %ventanaArticulos%.
-        return
-    }
-    if(WinExist(ventanaBuscar)){
-        CerrarVentanaBuscar()
-    }
-
-    ControlGetText, CodigoArticulo, %campoCodigoArt_Articulos%, %ventanaArticulos%
-    WinMenuSelectItem, %ventanaPrecios%, , Buscar, Por Clave
-    WinWait, %ventanaBuscar% ;Ésta es la ventana Buscar.
-    ControlSend, %campoContenido_Buscar%, %CodigoArticulo%, %ventanaBuscar% 
-    
-    CerrarVentanaBuscar()
-}
-
 CerrarVentanaBuscar(){
     if(not WinExist(ventanaBuscar)){
         MsgBox No existe %ventanaBuscar%.
@@ -337,29 +359,33 @@ CerrarVentanaBuscar(){
     }
     WinWaitClose, %ventanaBuscar%
 }
+;}
 
-ProximoArticulo(){ 
-    if(WinExist(ventanaArticulos)){
-        ;WinWait, %ventanaArticulos%
-        WinMenuSelectItem, %ventanaArticulos%, , Buscar, Siguiente ;Modo Modificar.
-        ;ControlSend,,{PGDN}, %ventanaArticulos%
-    }
-    if(WinExist(ventanaPrecios)){
-        ;WinWait, %ventanaPrecios%
-        WinMenuSelectItem, %ventanaPrecios%, , Buscar, Siguiente
-        ;ControlSend,,{PGDN}, %ventanaPrecios%
-    }
+;{ Logging
+LogPriceChange(itemID := "", oldPrice := "", newPrice = ""){
+    percent := (100*newPrice/oldPrice)-100
+    percent := Round(percent, 1)
+    finalText = %itemID%: %oldPrice% -> %newPrice% (%percent%`%)`r`n
+    LogSend(finalText)
 }
 
-AnteriorArticulo(){
-    if(WinExist(ventanaArticulos)){
-        ControlSend,,{PGUP}, %ventanaArticulos%
-    }
-    if(WinExist(ventanaPrecios)){
-        ControlSend,,{PGUP}, %ventanaPrecios%
-    }
+LogArticleDeletion(itemID := "", oldDesc := ""){
+    finalText = Eliminación: %itemID% (%oldDesc%)`r`n
+    LogSend(finalText)
 }
 
+LogDescChange(itemID := "", oldDesc := "", newDesc = ""){
+    finalText = %itemID%: %oldDesc% -> %newDesc%`r`n
+    LogSend(finalText)
+}
+
+LogSend(finalText := ""){
+    ControlSend,,^{End}, %ventanaNotepad% ;Ctrl+End: Go to end of document
+    Control, EditPaste, %finalText%, , %ventanaNotepad%
+}
+;}
+
+;{ Misc
 EstilizarVentanas(Activar := 1){
     if(Activar == 1){
         WinSet, AlwaysOnTop, On, %ventanaArticulos%
@@ -394,30 +420,22 @@ EstilizarVentanas(Activar := 1){
     }
 }
 
-LogPriceChange(itemID := "", oldPrice := "", newPrice = ""){
-    percent := (100*newPrice/oldPrice)-100
-    percent := Round(percent, 1)
-    finalText = %itemID%: %oldPrice% -> %newPrice% (%percent%`%)`r`n
-    LogSend(finalText)
+IsNum( str ) { ;Fuck AHK.
+	if str is number
+		return true
+	return false
 }
 
-LogArticleDeletion(itemID := "", oldDesc := ""){
-    finalText = Eliminación: %itemID% (%oldDesc%)`r`n
-    LogSend(finalText)
+IsAlwaysOnTop( Window ) {
+    WinGet, Estilo, ExStyle, %Window%
+    Return (Estilo & 0x8) ; 0x8 is WS_EX_TOPMOST.
 }
-
-LogDescChange(itemID := "", oldDesc := "", newDesc = ""){
-    finalText = %itemID%: %oldDesc% -> %newDesc%`r`n
-    LogSend(finalText)
-}
-
-LogSend(finalText := ""){
-    ControlSend,,^{End}, %ventanaNotepad% ;Ctrl+End: Go to end of document
-    Control, EditPaste, %finalText%, , %ventanaNotepad%
-}
+;}
 
 Launch_Media::
-MsgBox, Testing...
+;MultiplicarPrecio98o99()
+EliminacionArticulo()
+;MsgBox, Testing...
 return
 
 Volume_Up::
