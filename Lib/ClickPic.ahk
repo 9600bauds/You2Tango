@@ -1,7 +1,8 @@
 ﻿;ClickPic, PicExists by 9600bauds
 
 PicExists(filename) {
-    CoordMode, Pixel, Mouse, Screen
+    CoordMode, Pixel, Screen
+    CoordMode, Mouse, Screen
     ImageSearch, FoundX, FoundY, 0, 0, %A_ScreenWidth%, %A_ScreenHeight%, %filename%
     if (ErrorLevel = 2){
         MsgBox PicExists - Could not conduct the search for %filename%.
@@ -14,7 +15,8 @@ PicExists(filename) {
 }
 
 ClickPic(filename, offsetX:=0, offsetY:=0) {  
-    CoordMode, Pixel, Mouse, Screen
+    CoordMode, Pixel, Screen
+    CoordMode, Mouse, Screen
     ImageSearch, FoundX, FoundY, 0, 0, %A_ScreenWidth%, %A_ScreenHeight%, %filename%
     if (ErrorLevel = 2){
         MsgBox ClickPic - Could not conduct the search for %filename%.
@@ -32,7 +34,8 @@ ClickPic(filename, offsetX:=0, offsetY:=0) {
 }
 
 WaitNotPic(filename, interval:=100, tries:=25) {
-    CoordMode, Pixel, Mouse, Screen
+    CoordMode, Pixel, Screen
+    CoordMode, Mouse, Screen
     Loop, 50
     {
         ImageSearch, FoundX, FoundY, 0, 0, %A_ScreenWidth%, %A_ScreenHeight%, %filename%
