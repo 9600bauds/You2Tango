@@ -2,9 +2,9 @@
 
 PicExists(filename) {
     CoordMode, Pixel, Mouse, Screen
-    ImageSearch, FoundX, FoundY, 0, 0, A_ScreenWidth, A_ScreenHeight, %filename%
+    ImageSearch, FoundX, FoundY, 0, 0, %A_ScreenWidth%, %A_ScreenHeight%, %filename%
     if (ErrorLevel = 2){
-        MsgBox Could not conduct the search for %filename%.
+        MsgBox PicExists - Could not conduct the search for %filename%.
         return false
     }
     if (ErrorLevel = 0){
@@ -15,13 +15,13 @@ PicExists(filename) {
 
 ClickPic(filename, offsetX:=0, offsetY:=0) {  
     CoordMode, Pixel, Mouse, Screen
-    ImageSearch, FoundX, FoundY, 0, 0, A_ScreenWidth, A_ScreenHeight, %filename%
+    ImageSearch, FoundX, FoundY, 0, 0, %A_ScreenWidth%, %A_ScreenHeight%, %filename%
     if (ErrorLevel = 2){
-        MsgBox Could not conduct the search for %filename%.
+        MsgBox ClickPic - Could not conduct the search for %filename%.
         return false
     }
     if (ErrorLevel = 1){
-        MsgBox Icon %filename% could not be found on the screen.
+        MsgBox ClickPic - Icon %filename% could not be found on the screen.
         return false
     }
     
@@ -33,12 +33,11 @@ ClickPic(filename, offsetX:=0, offsetY:=0) {
 
 WaitNotPic(filename, interval:=100, tries:=25) {
     CoordMode, Pixel, Mouse, Screen
-    
     Loop, 50
     {
-        ImageSearch, FoundX, FoundY, 0, 0, A_ScreenWidth, A_ScreenHeight, %filename%
+        ImageSearch, FoundX, FoundY, 0, 0, %A_ScreenWidth%, %A_ScreenHeight%, %filename%
         if (ErrorLevel == 2){
-            MsgBox Could not conduct the search for %filename%.
+            MsgBox WaitNotPic - Could not conduct the search for %filename%.
             return false
         }
         if (ErrorLevel == 1){
