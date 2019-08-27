@@ -72,7 +72,7 @@ CambiarCampoVentanaArticulos(field := "", newText = ""){
 ;{ Ventana Artículos - Funciones
 EliminacionArticulo(doAfter:=""){    
     ControlGetText, itemID, %campoCodigoArt_Articulos%, %ventanaArticulos% ;Para el logging
-    ControlGetText, oldDesc, %campoDescAdicional%, %ventanaArticulos% ;Para el logging.
+    ControlGetText, oldDesc, %campoDesc_Articulos%, %ventanaArticulos% ;Para el logging.
     ControlGetText, Clipboard, %campoDesc_Articulos%, %ventanaArticulos% ;Copiamos al portapapeles, por si accidentalmente borramos un artículo equivocado.
     
     if(not CambiarCampoVentanaArticulos(campoDesc_Articulos, "ZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ")){
