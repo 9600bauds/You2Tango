@@ -27,6 +27,7 @@ global ventanaNotepad := "ahk_class Notepad"
 
 global multiplicadorPrecio1 := 1.21
 global multiplicadorPrecio2 := 1
+global multiplicadorExtra := 0
 ;}
 
 ;{ Ventana Artículos - Helpers
@@ -179,27 +180,36 @@ SeleccionarPrecio98o99(){
 
 ;{ Ventana Precios - Funciones
 IngresarMultiplicadoresPrecio(){
-    explanation := "Ingrese el descuento con el siguiente formato:`n1.21 para +21`%`n0.8 para -20`%"
+    explanation := "Ingrese el descuento con el siguiente formato:`n1.21 o 21% para +21`%`n0.8 o -20% para -20`%"
     newMultiplier := 0
     InputBox, newMultiplier, Descuento Básico, %explanation%,,,,,,,,%multiplicadorPrecio1%
-    if(IsNum(newMultiplier)) {
+    if ErrorLevel
+        return ;Cancel
+    if(ParsePercent(newMultiplier)) {
         multiplicadorPrecio1 := newMultiplier
     }
     else{
-        MsgBox, No se ingresó un número.
+        MsgBox, No se ingresó un número. (%newMultiplier%)
     }
     
     InputBox, newMultiplier, Descuento Alternativo, %explanation%,,,,,,,,%multiplicadorPrecio2%
-    if(IsNum(newMultiplier)) {
+    if ErrorLevel
+        return ;Cancel
+    if(ParsePercent(newMultiplier)) {
         multiplicadorPrecio2 := newMultiplier
     }
     else{
-        MsgBox, No se ingresó un número.
+        MsgBox, No se ingresó un número. (%newMultiplier%)
     }
 }
 
 PegarPrecio98o99(mult:=1){
     if(not SeleccionarPrecio98o99()){
+        return false
+    }
+    mult := ParsePercent(mult)
+    if(mult == 0){
+        MsgBox, Multiplicador inválido! - PegarPrecio98o99
         return false
     }
     
@@ -238,13 +248,16 @@ PegarPrecio98o99(mult:=1){
 
 MultiplicarPrecio98o99(mult:=0){
     if(mult == 0){
-        explanation := "Ingrese el porcentaje a añadir o restar con el siguiente formato:`n1.21 para +21`%`n0.8 para -20`%"
-        InputBox, mult, Porcentaje, %explanation%,,,,,,,,%mult%
+        explanation := "Ingrese el porcentaje a añadir o restar con el siguiente formato:`n1.21 o 21% para +21`%`n0.8 o -20% para -20`%"
+        InputBox, multInput, Porcentaje, %explanation%,,,,,,,,%multiplicadorExtra%
+        if ErrorLevel
+            return ;Cancel
+        mult := ParsePercent(multInput)
         if(!IsNum(mult) or mult == 0) {
-            MsgBox, No se ingresó un número.
+            MsgBox, No se ingresó un número. (%mult%)
             return
         }
-        ;todo: big "+20%" number to multiplier
+        multiplicadorExtra := multInput
     }
     
     if(not SeleccionarPrecio98o99()){
@@ -419,6 +432,19 @@ EstilizarVentanas(Activar := 1){
         
         WinSet, AlwaysOnTop, Off, %ventanaNotepad%
         WinSet, Region, , %ventanaNotepad%
+    }
+}
+
+ParsePercent(input){
+    if(InStr(input, "%")){
+        input := RegExReplace(input, "[^0-9|\-|.]") ;Sólo numeros.
+        return (100+input)/100
+    }
+    else{
+        if(not IsNum(input)){
+            return 0
+        }
+        return input
     }
 }
 
