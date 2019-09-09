@@ -15,7 +15,8 @@ global campoDescAdicional := "TEdit8"
 global campoDesc_Articulos := "TEdit9"
 
 global ventanaPrecios := "ACTUALIZACION DE PRECIOS INDIVIDUAL POR ARTICULO"
-global campoCodigoArt_Precios := "TEdit6"
+global campoCodigoArt_Precios_ModoNoModificar := "TEdit2" ;EN MODO NO MODIFICAR
+global campoCodigoArt_Precios_ModoModificar := "TEdit6" ;EN MODO MODIFICAR
 global campoPrecioActual := "TNumEditTg1"
 
 global ventanaBuscar := "ahk_class TFrmBuscar"
@@ -31,13 +32,14 @@ global multiplicadorExtra := 0
 ;}
 
 ;{ Ventana Artículos - Helpers
-CopiarUnidadMedidaVentas(){
+GetUnidadMedidaVentas(){
     if(not WinExist(ventanaArticulos)){
         MsgBox No existe %ventanaArticulos%.
         return
     }
 
-    ControlGetText, Clipboard, %campoMedidaVentas%, %ventanaArticulos%
+    ControlGetText, unidadMedida, %campoMedidaVentas%, %ventanaArticulos%
+    return unidadMedida
 }
 
 CambiarCampoVentanaArticulos(field := "", newText = ""){
@@ -176,6 +178,19 @@ SeleccionarPrecio98o99(){
     
     return true
 }
+
+GetCodigoVentanaPrecios(){
+    if(not WinExist(ventanaArticulos)){
+        MsgBox No existe %ventanaArticulos%.
+        return
+    }
+    
+    ControlGetText, itemID, %campoCodigoArt_Precios_ModoNoModificar%, %ventanaPrecios%
+    if(not isNum(itemID)){
+        ControlGetText, itemID, %campoCodigoArt_Precios_ModoModificar%, %ventanaPrecios%
+    }
+    return itemID
+}
 ;}
 
 ;{ Ventana Precios - Funciones
@@ -204,6 +219,11 @@ IngresarMultiplicadoresPrecio(){
 }
 
 PegarPrecio98o99(mult:=1){
+    if(not SincronizadosArticulosPrecio()){
+        MsgBox, Ventana Artículos y ventana Precios no están actualizadas!
+        return false
+    }
+    
     if(not SeleccionarPrecio98o99()){
         return false
     }
@@ -223,7 +243,7 @@ PegarPrecio98o99(mult:=1){
     multiplied := (Clipboard * mult)
     multiplied = % Round(multiplied, 2) ;Tango sólo quiere 2 decimales.
     
-    ControlGetText, itemID, %campoCodigoArt_Precios%, %ventanaPrecios%
+    itemID := GetCodigoVentanaPrecios()
     ControlGetText, oldPrice, %campoPrecioActual%, %ventanaPrecios%
     
     percent := (100*multiplied/oldPrice)-100
@@ -264,7 +284,7 @@ MultiplicarPrecio98o99(mult:=0){
         return false
     }
     
-    ControlGetText, itemID, %campoCodigoArt_Precios%, %ventanaPrecios%
+    itemID := GetCodigoVentanaPrecios()
     ControlGetText, oldPrice, %campoPrecioActual%, %ventanaPrecios%
     multiplied := oldPrice*mult
     multiplied = % Round(multiplied, 2) ;Tango sólo quiere 2 decimales.
@@ -297,6 +317,27 @@ SincronizarArticulosPrecio(){
     ControlSend, %campoContenido_Buscar%, %CodigoArticulo%, %ventanaBuscar% 
     
     CerrarVentanaBuscar()
+}
+
+SincronizadosArticulosPrecio(){
+    if(not WinExist(ventanaPrecios)){
+        MsgBox No existe %ventanaPrecios%.
+        return false
+    }
+    if(not WinExist(ventanaArticulos)){
+        MsgBox No existe %ventanaArticulos%.
+        return false
+    }
+    
+    ControlGetText, CodigoArticulos, %campoCodigoArt_Articulos%, %ventanaArticulos%
+    CodigoPrecios := GetCodigoVentanaPrecios()
+    
+    if(CodigoArticulos == CodigoPrecios){
+        return true
+    }
+    else{
+        return false
+    }
 }
 
 ProximoArticulo(){ 
@@ -516,13 +557,13 @@ return
 ^Launch_Mail::
 SincronizarArticulosPrecio()
 Sleep, 100
-CopiarUnidadMedidaVentas()
+Clipboard := GetUnidadMedidaVentas()
 Sleep, 100
 BuscarPorPortapapel()
 return
 
 Browser_Search::
-CopiarUnidadMedidaVentas()
+Clipboard := GetUnidadMedidaVentas()
 Sleep,100
 BuscarPorPortapapel()
 
