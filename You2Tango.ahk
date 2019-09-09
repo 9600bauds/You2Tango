@@ -489,6 +489,10 @@ Volume_Mute::
 IngresarMultiplicadoresPrecio()
 return
 
+^Volume_Mute::
+MultiplicarPrecio98o99()
+return
+
 Media_Play_Pause::
 ActualizarDescripFecha("search")
 return
@@ -521,6 +525,13 @@ Browser_Search::
 CopiarUnidadMedidaVentas()
 Sleep,100
 BuscarPorPortapapel()
+
+;Sleep,100
+;Send, {Esc}
+;Send, {Left}
+;Send, {Left}
+;Send, ^c
+
 return
 
 Browser_Home::
