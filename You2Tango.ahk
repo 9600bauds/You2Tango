@@ -70,11 +70,21 @@ CambiarCampoVentanaArticulos(field := "", newText = ""){
     
     return true
 }
+
+GetCodigoVentanaArticulos(){
+    if(not WinExist(ventanaArticulos)){
+        MsgBox No existe %ventanaArticulos%.
+        return
+    }
+    
+    ControlGetText, itemID, %campoCodigoArt_Articulos%, %ventanaArticulos%
+    return itemID
+}
 ;}
 
 ;{ Ventana Artículos - Funciones
 EliminacionArticulo(doAfter:=""){    
-    ControlGetText, itemID, %campoCodigoArt_Articulos%, %ventanaArticulos% ;Para el logging
+    itemID := GetCodigoVentanaArticulos() ;Para el logging
     ControlGetText, oldDesc, %campoDesc_Articulos%, %ventanaArticulos% ;Para el logging.
     ControlGetText, Clipboard, %campoDesc_Articulos%, %ventanaArticulos% ;Copiamos al portapapeles, por si accidentalmente borramos un artículo equivocado.
     
@@ -99,7 +109,7 @@ ActualizarDescripFecha(doAfter:="", replacement:=""){
         FormatTime, replacement, , MM/yyyy
     }
         
-    ControlGetText, itemID, %campoCodigoArt_Articulos%, %ventanaArticulos% ;Para el logging.
+    itemID := GetCodigoVentanaArticulos() ;Para el logging.
     ControlGetText, oldDesc, %campoDescAdicional%, %ventanaArticulos% ;Para el logging.
     ControlGetText, Clipboard, %campoDescAdicional%, %ventanaArticulos% ;Copiamos al portapapeles, por si accidentalmente sobreescribimos la descripción de un artículo equivocado.
     
@@ -180,8 +190,8 @@ SeleccionarPrecio98o99(){
 }
 
 GetCodigoVentanaPrecios(){
-    if(not WinExist(ventanaArticulos)){
-        MsgBox No existe %ventanaArticulos%.
+    if(not WinExist(ventanaPrecios)){
+        MsgBox No existe %ventanaPrecios%.
         return
     }
     
@@ -311,7 +321,7 @@ SincronizarArticulosPrecio(){
         CerrarVentanaBuscar()
     }
 
-    ControlGetText, CodigoArticulo, %campoCodigoArt_Articulos%, %ventanaArticulos%
+    CodigoArticulo := GetCodigoVentanaArticulos()
     WinMenuSelectItem, %ventanaPrecios%, , Buscar, Por Clave
     WinWait, %ventanaBuscar% ;Ésta es la ventana Buscar.
     ControlSend, %campoContenido_Buscar%, %CodigoArticulo%, %ventanaBuscar% 
@@ -329,7 +339,7 @@ SincronizadosArticulosPrecio(){
         return false
     }
     
-    ControlGetText, CodigoArticulos, %campoCodigoArt_Articulos%, %ventanaArticulos%
+    CodigoArticulos := GetCodigoVentanaArticulos()
     CodigoPrecios := GetCodigoVentanaPrecios()
     
     if(CodigoArticulos == CodigoPrecios){
