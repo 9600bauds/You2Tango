@@ -395,6 +395,12 @@ LogDescChange(itemID := "", oldDesc := "", newDesc = ""){
 }
 
 LogSend(finalText := ""){
+    if(not WinExist(ventanaNotepad)){
+        prev := WinActive("A")
+        Run, Notepad
+        WinWait, %ventanaNotepad%
+        WinActivate, ahk_id %prev%
+    }
     ControlSend,,^{End}, %ventanaNotepad% ;Ctrl+End: Go to end of document
     Control, EditPaste, %finalText%, , %ventanaNotepad%
 }
@@ -460,8 +466,13 @@ IsAlwaysOnTop( Window ) {
 }
 ;}
 
+;{ AUTOEXEC
+if(not WinExist(ventanaNotepad)){
+    Run, Notepad
+}
+;}
+
 Launch_Media::
-;MultiplicarPrecio98o99()
 ;EliminacionArticulo()
 MsgBox, Testing...
 return
