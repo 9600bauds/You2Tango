@@ -196,7 +196,7 @@ GetCodigoVentanaPrecios(){
     }
     
     ControlGetText, itemID, %campoCodigoArt_Precios_ModoNoModificar%, %ventanaPrecios%
-    if(not isNum(itemID)){
+    if(itemID == "S" or itemID == "N"){
         ControlGetText, itemID, %campoCodigoArt_Precios_ModoModificar%, %ventanaPrecios%
     }
     return itemID
