@@ -78,6 +78,7 @@ GetCodigoVentanaArticulos(){
     }
     
     ControlGetText, itemID, %campoCodigoArt_Articulos%, %ventanaArticulos%
+    itemID := RegExReplace(itemID, "[^0-9|\-|.]") ;Sólo numeros.
     return itemID
 }
 ;}
@@ -199,6 +200,7 @@ GetCodigoVentanaPrecios(){
     if(itemID == "S" or itemID == "N"){
         ControlGetText, itemID, %campoCodigoArt_Precios_ModoModificar%, %ventanaPrecios%
     }
+    itemID := RegExReplace(itemID, "[^0-9|\-|.]") ;Sólo numeros.
     return itemID
 }
 ;}
