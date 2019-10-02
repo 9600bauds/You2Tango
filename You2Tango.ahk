@@ -268,7 +268,7 @@ PegarPrecio98o99(mult:=1){
             return
         }
     }
-    LogPriceChange(itemID, oldPrice, multiplied)
+    LogPriceChange(itemID, oldPrice, multiplied, mult)
     
     Send, %multiplied%
     Send, {F10}
@@ -299,7 +299,7 @@ MultiplicarPrecio98o99(mult:=0){
     multiplied := oldPrice*mult
     multiplied = % Round(multiplied, 2) ;Tango sólo quiere 2 decimales.
     
-    LogPriceChange(itemID, oldPrice, multiplied)
+    LogPriceChange(itemID, oldPrice, multiplied, mult)
     ControlSetText, %campoPrecioActual%, %multiplied%, %ventanaPrecios%
     Send, {F10}
     Sleep, 150
@@ -443,10 +443,10 @@ CerrarVentanaBuscar(){
 ;}
 
 ;{ Logging
-LogPriceChange(itemID := "", oldPrice := "", newPrice = ""){
+LogPriceChange(itemID := "", oldPrice := "", newPrice = "", mult := ""){
     percent := (100*newPrice/oldPrice)-100
     percent := Round(percent, 1)
-    finalText = %itemID%: %oldPrice% -> %newPrice% (%percent%`%)`r`n
+    finalText = %itemID%: %percent%`% (x%mult%, %oldPrice% -> %newPrice%)`r`n
     LogSend(finalText)
 }
 
