@@ -78,7 +78,6 @@ GetCodigoVentanaArticulos(){
     }
     
     ControlGetText, itemID, %campoCodigoArt_Articulos%, %ventanaArticulos%
-    itemID := RegExReplace(itemID, "[^0-9|\-|.]") ;Sólo numeros.
     return itemID
 }
 ;}
@@ -200,7 +199,6 @@ GetCodigoVentanaPrecios(){
     if(itemID == "S" or itemID == "N"){
         ControlGetText, itemID, %campoCodigoArt_Precios_ModoModificar%, %ventanaPrecios%
     }
-    itemID := RegExReplace(itemID, "[^0-9|\-|.]") ;Sólo numeros.
     return itemID
 }
 ;}
@@ -331,6 +329,23 @@ SincronizarArticulosPrecio(){
     CerrarVentanaBuscar()
 }
 
+LazySincronizarArticulosPrecio(){ ;Intento rudimentario para arreglar la desincronización
+    if(WinExist(ventanaArticulos) and WinExist(ventanaPrecios)){
+        WinWait, %ventanaArticulos%
+        WinWait, %ventanaPrecios%
+        CodigoArticulos := GetCodigoVentanaArticulos()
+        CodigoArticulos := RegExReplace(CodigoArticulos, "[^0-9|\-|.]") ;Sólo numeros.
+        CodigoPrecios := GetCodigoVentanaPrecios()
+        CodigoPrecios := RegExReplace(CodigoPrecios, "[^0-9|\-|.]") ;Sólo numeros.
+        if(CodigoArticulos > CodigoPrecios){
+            WinMenuSelectItem, %ventanaPrecios%, , Buscar, Siguiente
+        }
+        else if(CodigoArticulos < CodigoPrecios){
+            WinMenuSelectItem, %ventanaArticulos%, , Buscar, Siguiente
+        }
+    }
+}
+
 SincronizadosArticulosPrecio(){
     if(not WinExist(ventanaPrecios)){
         MsgBox No existe %ventanaPrecios%.
@@ -354,24 +369,22 @@ SincronizadosArticulosPrecio(){
 
 ProximoArticulo(){ 
     if(WinExist(ventanaArticulos)){
-        ;WinWait, %ventanaArticulos%
-        WinMenuSelectItem, %ventanaArticulos%, , Buscar, Siguiente ;Modo Modificar.
-        ;ControlSend,,{PGDN}, %ventanaArticulos%
+        WinMenuSelectItem, %ventanaArticulos%, , Buscar, Siguiente
     }
     if(WinExist(ventanaPrecios)){
-        ;WinWait, %ventanaPrecios%
         WinMenuSelectItem, %ventanaPrecios%, , Buscar, Siguiente
-        ;ControlSend,,{PGDN}, %ventanaPrecios%
     }
+    LazySincronizarArticulosPrecio()
 }
 
 AnteriorArticulo(){
     if(WinExist(ventanaArticulos)){
-        ControlSend,,{PGUP}, %ventanaArticulos%
+        WinMenuSelectItem, %ventanaArticulos%, , Buscar, Anterior
     }
     if(WinExist(ventanaPrecios)){
-        ControlSend,,{PGUP}, %ventanaPrecios%
+        WinMenuSelectItem, %ventanaPrecios%, , Buscar, Anterior
     }
+    LazySincronizarArticulosPrecio()
 }
 ;}
 
@@ -578,13 +591,11 @@ Browser_Search::
 Clipboard := GetUnidadMedidaVentas()
 Sleep,100
 BuscarPorPortapapel()
-
-;Sleep,100
+;Sleep, 100
 ;Send, {Esc}
 ;Send, {Left}
 ;Send, {Left}
 ;Send, ^c
-
 return
 
 Browser_Home::
