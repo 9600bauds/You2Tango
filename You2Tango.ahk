@@ -29,6 +29,13 @@ global ventanaNotepad := "ahk_class Notepad"
 global multiplicadorPrecio1 := 1.21
 global multiplicadorPrecio2 := 1
 global multiplicadorExtra := 0
+
+global search_Default = "Default"
+global search_Exact = "Exact"
+global search_Start = "Match Start"
+global search_End = "Match End"
+global search_Fabrimport = "Fabrimport"
+global searchType := "Default"
 ;}
 
 ;{ Ventana Artículos - Helpers
@@ -39,6 +46,20 @@ GetUnidadMedidaVentas(){
     }
 
     ControlGetText, unidadMedida, %campoMedidaVentas%, %ventanaArticulos%
+    
+    if(searchType == "Exact"){
+        unidadMedida := "^" . unidadMedida . "$"
+    }
+    else if(searchType == "Match Start"){
+        unidadMedida := "^" . unidadMedida
+    }
+    else if(searchType == "Match End"){
+        unidadMedida := unidadMedida . "$"
+    }
+    else if(searchType == "Fabrimport"){
+        unidadMedida := "[^0-9]" . unidadMedida . "$"
+    }
+        
     return unidadMedida
 }
 
@@ -472,6 +493,38 @@ LogSend(finalText := ""){
 }
 ;}
 
+;{ Opciones
+Menu, Tray, Add  ; Add a separator line.
+;Menu, Tray, Add, Item1, MenuHandler
+
+Menu, searchTypeMenu, Add, %search_Default%, setSearchDefault, Radio
+Menu, searchTypeMenu, Add, %search_Exact%, setSearchExact, Radio
+Menu, searchTypeMenu, Add, %search_Start%, setSearchStart, Radio
+Menu, searchTypeMenu, Add, %search_End%, setSearchEnd, Radio
+Menu, searchTypeMenu, Add, %search_Fabrimport%, setSearchFabrimport, Radio
+setSearchType(search_Default)
+
+setSearchType(type){
+    searchType := type
+    
+    Menu, searchTypeMenu, Uncheck, %search_Default%
+    Menu, searchTypeMenu, Uncheck, %search_Exact%
+    Menu, searchTypeMenu, Uncheck, %search_Start%
+    Menu, searchTypeMenu, Uncheck, %search_End%
+    Menu, searchTypeMenu, Uncheck, %search_Fabrimport%
+    Menu, searchTypeMenu, Check, %type%
+    
+}
+
+
+
+; Create a submenu in the first menu (a right-arrow indicator). When the user selects it, the second menu is displayed.
+Menu, Tray, Add, Search Type, :searchTypeMenu
+
+Menu, Tray, Add  ; Add a separator line.
+Menu, Tray, Add, Exit, Exit
+;}
+
 ;{ Misc
 EstilizarVentanas(Activar := 1){
     if(Activar == 1){
@@ -536,6 +589,33 @@ IsAlwaysOnTop( Window ) {
 if(not WinExist(ventanaNotepad)){
     Run, Notepad
 }
+return
+;}
+
+;{ Opciones - post autoexec
+setSearchDefault:
+setSearchType("Default")
+return
+
+setSearchExact:
+setSearchType("Exact")
+return
+
+setSearchStart:
+setSearchType("Match Start")
+return
+
+setSearchEnd:
+setSearchType("Match End")
+return
+
+setSearchFabrimport:
+setSearchType("Fabrimport")
+return
+
+Exit:
+ExitApp
+return
 ;}
 
 Launch_Media::
