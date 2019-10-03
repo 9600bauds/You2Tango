@@ -7,7 +7,7 @@ SendMode Input  ; Recommended for new scripts due to its superior speed and reli
 SetWorkingDir %A_ScriptDir%  ; Ensures a consistent starting directory.
 SetTitleMatchMode, 2 ; Match window titles anywhere, not just at the start.
 
-;{ Globals
+;{ Globals (most of these are effectively defines)
 global ventanaArticulos := "ACTUALIZACION DE ARTICULOS"
 global campoMedidaVentas := "TEdit4"
 global campoCodigoArt_Articulos := "TEdit11"
@@ -516,8 +516,6 @@ setSearchType(type){
     
 }
 
-
-
 ; Create a submenu in the first menu (a right-arrow indicator). When the user selects it, the second menu is displayed.
 Menu, Tray, Add, Search Type, :searchTypeMenu
 
@@ -618,6 +616,7 @@ ExitApp
 return
 ;}
 
+;{ Keybinds
 Launch_Media::
 ;EliminacionArticulo()
 MsgBox, Testing...
@@ -685,6 +684,7 @@ return
 ^Browser_Home::
 PegarPrecio98o99(multiplicadorPrecio2)
 return
+;}
 
 #IfWinActive SOS DE STOCK ; Works for EGRESOS and INGRESOS. AHK does not have an OR operand for this command.
 ::cdm::Cambio de Mercadería - Blas
