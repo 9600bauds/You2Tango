@@ -34,6 +34,8 @@ global search_Default = "Default"
 global search_Exact = "Exact"
 global search_Start = "Match Start"
 global search_End = "Match End"
+global search_RemoveLastWord = "Remove Last Word"
+global search_Faroluz = "Faroluz"
 global search_Fabrimport = "Fabrimport"
 global searchType := "Default"
 ;}
@@ -47,16 +49,22 @@ GetUnidadMedidaVentas(){
 
     ControlGetText, unidadMedida, %campoMedidaVentas%, %ventanaArticulos%
     
-    if(searchType == "Exact"){
+    if(searchType == search_Exact){
         unidadMedida := "^" . unidadMedida . "$"
     }
-    else if(searchType == "Match Start"){
+    else if(searchType == search_Start){
         unidadMedida := "^" . unidadMedida
     }
-    else if(searchType == "Match End"){
+    else if(searchType == search_End){
         unidadMedida := unidadMedida . "$"
     }
-    else if(searchType == "Fabrimport"){
+    else if(searchType == search_RemoveLastWord){
+        unidadMedida := RegExReplace(unidadMedida, " \w+$", "")
+    }
+    else if(searchType == search_Faroluz){
+        unidadMedida := RegExReplace(unidadMedida, " \w+$", "") . "$"
+    }
+    else if(searchType == search_Fabrimport){
         unidadMedida := "[^0-9]" . unidadMedida . "$"
     }
         
@@ -501,6 +509,8 @@ Menu, searchTypeMenu, Add, %search_Default%, setSearchDefault, Radio
 Menu, searchTypeMenu, Add, %search_Exact%, setSearchExact, Radio
 Menu, searchTypeMenu, Add, %search_Start%, setSearchStart, Radio
 Menu, searchTypeMenu, Add, %search_End%, setSearchEnd, Radio
+Menu, searchTypeMenu, Add, %search_RemoveLastWord%, setSearchRemoveLastWord, Radio
+Menu, searchTypeMenu, Add, %search_Faroluz%, setSearchFaroluz, Radio
 Menu, searchTypeMenu, Add, %search_Fabrimport%, setSearchFabrimport, Radio
 setSearchType(search_Default)
 
@@ -511,6 +521,8 @@ setSearchType(type){
     Menu, searchTypeMenu, Uncheck, %search_Exact%
     Menu, searchTypeMenu, Uncheck, %search_Start%
     Menu, searchTypeMenu, Uncheck, %search_End%
+    Menu, searchTypeMenu, Uncheck, %search_RemoveLastWord%
+    Menu, searchTypeMenu, Uncheck, %search_Faroluz%
     Menu, searchTypeMenu, Uncheck, %search_Fabrimport%
     Menu, searchTypeMenu, Check, %type%
     
@@ -592,23 +604,31 @@ return
 
 ;{ Opciones - post autoexec
 setSearchDefault:
-setSearchType("Default")
+setSearchType(search_Default)
 return
 
 setSearchExact:
-setSearchType("Exact")
+setSearchType(search_Exact)
 return
 
 setSearchStart:
-setSearchType("Match Start")
+setSearchType(search_Start)
 return
 
 setSearchEnd:
-setSearchType("Match End")
+setSearchType(search_End)
+return
+
+setSearchRemoveLastWord:
+setSearchType(search_RemoveLastWord)
+return
+
+setSearchFaroluz:
+setSearchType(search_Faroluz)
 return
 
 setSearchFabrimport:
-setSearchType("Fabrimport")
+setSearchType(search_Fabrimport)
 return
 
 Exit:
@@ -619,7 +639,7 @@ return
 ;{ Keybinds
 Launch_Media::
 ;EliminacionArticulo()
-MsgBox, Testing...
+msgbox, Testing...
 return
 
 Volume_Up::
