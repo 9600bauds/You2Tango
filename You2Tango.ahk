@@ -38,6 +38,8 @@ global search_RemoveLastWord = "Remove Last Word"
 global search_Faroluz = "Faroluz"
 global search_Fabrimport = "Fabrimport"
 global searchType := "Default"
+
+global parseNoDecimals := false
 ;}
 
 ;{ Ventana Artículos - Helpers
@@ -275,6 +277,9 @@ PegarPrecio98o99(mult:=1){
     Clipboard := RegExReplace(Clipboard, ",", ".") ;Reemplazar comas por puntos.
     Clipboard := RegExReplace(Clipboard, "\.(?![^.]+$)")  ;Quitar todos los puntos excepto el último.
     Clipboard := RegExReplace(Clipboard, "[^0-9.]") ;Eliminar todo excepto números y puntos.
+    if(parseNoDecimals == true){
+        Clipboard := RegExReplace(Clipboard, "[.]") ;Eliminar puntos también.
+    }
     if(not IsNum(Clipboard)) {
         MsgBox, Clipboard is not a number.
         return
@@ -503,7 +508,20 @@ LogSend(finalText := ""){
 
 ;{ Opciones
 Menu, Tray, Add  ; Add a separator line.
-;Menu, Tray, Add, Item1, MenuHandler
+
+Menu, Tray, Add, No Decimals, NoDecimals
+toggleNoDecimals(){
+    if (parseNoDecimals == true){
+        Menu, Tray, Uncheck, No Decimals
+        parseNoDecimals := false
+    }
+    else{
+        Menu, Tray, Check, No Decimals
+        parseNoDecimals := true
+    }
+}
+
+Menu, Tray, Add  ; Add a separator line.
 
 Menu, searchTypeMenu, Add, %search_Default%, setSearchDefault, Radio
 Menu, searchTypeMenu, Add, %search_Exact%, setSearchExact, Radio
@@ -603,6 +621,10 @@ return
 ;}
 
 ;{ Opciones - post autoexec
+NoDecimals:
+toggleNoDecimals()
+return
+
 setSearchDefault:
 setSearchType(search_Default)
 return
