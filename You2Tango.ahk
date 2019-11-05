@@ -43,7 +43,7 @@ global parseNoDecimals := false
 ;}
 
 ;{ Ventana Artículos - Helpers
-GetUnidadMedidaVentas(){
+GetUnidadMedidaVentas(postSearch := true){
     if(not WinExist(ventanaArticulos)){
         MsgBox No existe %ventanaArticulos%.
         return
@@ -51,23 +51,25 @@ GetUnidadMedidaVentas(){
 
     ControlGetText, unidadMedida, %campoMedidaVentas%, %ventanaArticulos%
     
-    if(searchType == search_Exact){
-        unidadMedida := "^" . unidadMedida . "$"
-    }
-    else if(searchType == search_Start){
-        unidadMedida := "^" . unidadMedida
-    }
-    else if(searchType == search_End){
-        unidadMedida := unidadMedida . "$"
-    }
-    else if(searchType == search_RemoveLastWord){
-        unidadMedida := RegExReplace(unidadMedida, " \w+$", "")
-    }
-    else if(searchType == search_Faroluz){
-        unidadMedida := RegExReplace(unidadMedida, " \w+$", "") . "$"
-    }
-    else if(searchType == search_Fabrimport){
-        unidadMedida := "[^0-9]" . unidadMedida . "$"
+    if(postSearch){
+        if(searchType == search_Exact){
+            unidadMedida := "^" . unidadMedida . "$"
+        }
+        else if(searchType == search_Start){
+            unidadMedida := "^" . unidadMedida
+        }
+        else if(searchType == search_End){
+            unidadMedida := unidadMedida . "$"
+        }
+        else if(searchType == search_RemoveLastWord){
+            unidadMedida := RegExReplace(unidadMedida, " \w+$", "")
+        }
+        else if(searchType == search_Faroluz){
+            unidadMedida := RegExReplace(unidadMedida, " \w+$", "") . "$"
+        }
+        else if(searchType == search_Fabrimport){
+            unidadMedida := "[^0-9]" . unidadMedida . "$"
+        }
     }
         
     return unidadMedida
@@ -104,7 +106,7 @@ CambiarCampoVentanaArticulos(field := "", newText = ""){
 
 GetCodigoVentanaArticulos(){
     if(not WinExist(ventanaArticulos)){
-        MsgBox No existe %ventanaArticulos%.
+        MsgBox GetCodigoVentanaArticulos - No existe %ventanaArticulos%.
         return
     }
     
@@ -164,7 +166,7 @@ MassActualizarDesc(){
     arr = 1578,2134,3758,5638,6544,500,2886
     
     if(not WinExist(ventanaArticulos)){
-        MsgBox No existe %ventanaArticulos%.
+        MsgBox MassActualizarDesc - No existe %ventanaArticulos%.
         return
     }
     
@@ -710,6 +712,7 @@ return
 
 Browser_Search::
 Clipboard := GetUnidadMedidaVentas()
+;CorregirUnidadMedidaVentas("Ferrolux")
 Sleep,100
 BuscarPorPortapapel()
 ;Sleep, 100
