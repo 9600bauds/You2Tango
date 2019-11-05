@@ -14,6 +14,10 @@ global campoCodigoArt_Articulos := "TEdit11"
 global campoDescAdicional := "TEdit8"
 global campoDesc_Articulos := "TEdit9"
 
+global ventanaArticulos_OKchild := "ahk_class TFormChildTg"
+global campoOKChild_1 := "TNumEditTg4"
+global campoOKChild_2 := "TEdit4"
+
 global ventanaPrecios := "ACTUALIZACION DE PRECIOS INDIVIDUAL POR ARTICULO"
 global campoCodigoArt_Precios_ModoNoModificar := "TEdit2" ;EN MODO NO MODIFICAR
 global campoCodigoArt_Precios_ModoModificar := "TEdit6" ;EN MODO MODIFICAR
@@ -193,6 +197,32 @@ MassActualizarDesc(){
         Send, %A_LoopField%
     }
     ActualizarDescripFecha()
+}
+
+CorregirUnidadMedidaVentas(prov := ""){ ;Desvergonzadamente ad-hoc. Comentar el contenido para no hacer nada.
+    if(prov == ""){
+        return false
+    }
+    
+    if(not WinExist(ventanaArticulos)){
+        MsgBox CorregirMedidaVentas - No existe %ventanaArticulos%.
+        return false
+    }
+    
+    If(!IsAlwaysOnTop(ventanaArticulos)){
+        WinActivate, %ventanaArticulos%
+        WinWait, %ventanaArticulos%
+    }
+    
+    initialMedidaVentas := GetUnidadMedidaVentas(false)
+    Clipboard := initialMedidaVentas
+    if(prov == "Ferrolux"){
+        Clipboard := RegExReplace(Clipboard, "([a-zA-Z])([1-9])","$1-$2")
+        Clipboard := RegExReplace(Clipboard, " ","")
+    }
+    if(Clipboard != initialMedidaVentas){
+        CambiarCampoVentanaArticulos(campoMedidaVentas, Clipboard)
+    }
 }
 ;}
 
