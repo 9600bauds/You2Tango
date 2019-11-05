@@ -95,11 +95,7 @@ CambiarCampoVentanaArticulos(field := "", newText = ""){
     ControlFocus, %field%, %ventanaArticulos% ;Si no hacemos focus, Tango no detecta que hicimos algún cambio.
     ControlSetText, %field%, %newText%, %ventanaArticulos%
     WinWait, %ventanaArticulos%
-    Send, {F10}
-    Sleep, 150
-    Send, {F10}
-    Sleep, 150
-    Send, {F10}
+    AceptarCambiosVentanaArticulos()
     
     return true
 }
@@ -112,6 +108,21 @@ GetCodigoVentanaArticulos(){
     
     ControlGetText, itemID, %campoCodigoArt_Articulos%, %ventanaArticulos%
     return itemID
+}
+
+AceptarCambiosVentanaArticulos(){
+    DetectHiddenWindows, On
+    
+    if(not WinExist(ventanaArticulos)){
+        MsgBox AceptarCambiosVentanaArticulos - No existe %ventanaArticulos%.
+        return
+    }
+    
+    ControlSend, %campoMedidaVentas%, {F10}, %ventanaArticulos%
+    WinWait, %ventanaArticulos_OKchild%
+    ControlSend, %campoOKchild_1%, {F10}, %ventanaArticulos_OKchild%
+    WinWait, %ventanaArticulos_OKchild%
+    ControlSend, %campoOKchild_2%, {F10}, %ventanaArticulos_OKchild%
 }
 ;}
 
