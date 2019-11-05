@@ -28,6 +28,9 @@ global campoContenido_Buscar := "TcxCustomInnerTextEdit1"
 global checkboxFiltrar := "TCheckBox4"
 global checkboxIncremental := "TCheckBox3"
 
+global ventanaIngresosStock := "INGRESOS DE STOCK"
+global ventanaEgresosStock := "EGRESOS DE STOCK"
+
 global ventanaNotepad := "ahk_class Notepad"
 
 global multiplicadorPrecio1 := 1.21
@@ -599,6 +602,20 @@ Menu, Tray, Add, Exit, Exit
 ;{ Misc
 EstilizarVentanas(Activar := 1){
     if(Activar == 1){
+        
+        if(WinExist(ventanaArticulos_OKchild)){
+            WinMove, %ventanaArticulos_OKchild%, , 370, 276
+            return
+        }
+        
+        if(WinExist(ventanaIngresosStock) and WinExist(ventanaEgresosStock)){
+            WinMove, %ventanaIngresosStock%, , 255, 196
+            WinActivate, %ventanaIngresosStock%
+            WinMove, %ventanaEgresosStock%, , 255+572, 196
+            WinActivate, %ventanaEgresosStock%
+            return
+        }
+        
         WinSet, AlwaysOnTop, On, %ventanaArticulos%
         WinSet, Region, 0-0 W572 H222, %ventanaArticulos% ;Máscara de 572x222 empezando en 0,0
         WinMove, %ventanaArticulos%, , 1028, 26, 572
