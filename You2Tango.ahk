@@ -237,6 +237,21 @@ CorregirUnidadMedidaVentas(prov := ""){ ;Desvergonzadamente ad-hoc. Comentar el 
         CambiarCampoVentanaArticulos(campoMedidaVentas, Clipboard)
     }
 }
+
+PegarUnidadMedidaVentas(){ ;Para medidas desesperadas.
+    if(not WinExist(ventanaArticulos)){
+        MsgBox PegarUnidadMedidaVentas - No existe %ventanaArticulos%.
+        return false
+    }
+    
+    If(!IsAlwaysOnTop(ventanaArticulos)){
+        WinActivate, %ventanaArticulos%
+        WinWait, %ventanaArticulos%
+    }
+    
+    Clipboard := RegExReplace(Clipboard, " ","")
+    CambiarCampoVentanaArticulos(campoMedidaVentas, Clipboard)
+}
 ;}
 
 ;{ Ventana Precios - Helpers
