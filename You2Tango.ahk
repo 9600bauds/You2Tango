@@ -42,6 +42,7 @@ global search_Exact = "Exact"
 global search_Start = "Match Start"
 global search_End = "Match End"
 global search_RemoveLastWord = "Remove Last Word"
+global search_LongestNumber = "Longest Number"
 global search_Faroluz = "Faroluz"
 global search_Fabrimport = "Fabrimport"
 global searchType := "Default"
@@ -70,6 +71,15 @@ GetUnidadMedidaVentas(postSearch := true){
         }
         else if(searchType == search_RemoveLastWord){
             unidadMedida := RegExReplace(unidadMedida, " \w+$", "")
+        }
+        else if(searchType == search_LongestNumber){
+            longestMatch := ""
+            for index, match in AllRegexMatches(unidadMedida, "[\d]+"){
+                if(StrLen(match) > StrLen(longestMatch)){
+                    longestMatch := match
+                }
+            }
+            unidadMedida := longestMatch
         }
         else if(searchType == search_Faroluz){
             unidadMedida := RegExReplace(unidadMedida, " \w+$", "") . "$"
@@ -574,6 +584,7 @@ Menu, searchTypeMenu, Add, %search_Exact%, setSearchExact, Radio
 Menu, searchTypeMenu, Add, %search_Start%, setSearchStart, Radio
 Menu, searchTypeMenu, Add, %search_End%, setSearchEnd, Radio
 Menu, searchTypeMenu, Add, %search_RemoveLastWord%, setSearchRemoveLastWord, Radio
+Menu, searchTypeMenu, Add, %search_LongestNumber%, setSearchLongestNumber, Radio
 Menu, searchTypeMenu, Add, %search_Faroluz%, setSearchFaroluz, Radio
 Menu, searchTypeMenu, Add, %search_Fabrimport%, setSearchFabrimport, Radio
 setSearchType(search_Default)
@@ -586,6 +597,7 @@ setSearchType(type){
     Menu, searchTypeMenu, Uncheck, %search_Start%
     Menu, searchTypeMenu, Uncheck, %search_End%
     Menu, searchTypeMenu, Uncheck, %search_RemoveLastWord%
+    Menu, searchTypeMenu, Uncheck, %search_LongestNumber%
     Menu, searchTypeMenu, Uncheck, %search_Faroluz%
     Menu, searchTypeMenu, Uncheck, %search_Fabrimport%
     Menu, searchTypeMenu, Check, %type%
@@ -661,6 +673,17 @@ ParsePercent(input){
     }
 }
 
+AllRegexMatches(haystack, needle){
+    Pos := 1
+    Matches := []
+    M := ""
+    while(Pos := RegExMatch(haystack, needle, M, Pos + StrLen(M)))
+    {
+        Matches.Push(M)
+    }
+    return Matches
+}
+
 IsNum( str ) { ;Fuck AHK.
 	if str is number
 		return true
@@ -704,6 +727,11 @@ return
 setSearchRemoveLastWord:
 setSearchType(search_RemoveLastWord)
 return
+
+setSearchLongestNumber:
+setSearchType(search_LongestNumber)
+return
+
 
 setSearchFaroluz:
 setSearchType(search_Faroluz)
