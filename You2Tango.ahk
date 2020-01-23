@@ -15,7 +15,7 @@ global campoDescAdicional := "TEdit8"
 global campoDesc_Articulos := "TEdit9"
 
 global ventanaArticulos_OKchild := "ahk_class TFormChildTg"
-global campoOKChild_1 := "TNumEditTg4"
+global campoOKChild_1 := "TNumEditTg4" ;the long awaited comeback to OK boomer
 global campoOKChild_2 := "TEdit4"
 
 global ventanaPrecios := "ACTUALIZACION DE PRECIOS INDIVIDUAL POR ARTICULO"
@@ -212,7 +212,7 @@ MassActualizarDesc(){
     ActualizarDescripFecha()
 }
 
-CorregirUnidadMedidaVentas(prov := ""){ ;Desvergonzadamente ad-hoc. Comentar el contenido para no hacer nada.
+CorregirUnidadMedidaVentas(prov := ""){ ;Desvergonzadamente ad-hoc. Requiere argumento.
     if(prov == ""){
         return false
     }
@@ -249,6 +249,7 @@ PegarUnidadMedidaVentas(){ ;Para medidas desesperadas.
         WinWait, %ventanaArticulos%
     }
     
+    ;todo logging
     Clipboard := RegExReplace(Clipboard, " ","")
     CambiarCampoVentanaArticulos(campoMedidaVentas, Clipboard)
 }
@@ -375,7 +376,7 @@ PegarPrecio98o99(mult:=1){
     }
     LogPriceChange(itemID, oldPrice, multiplied, mult)
     
-    Send, %multiplied%
+    ControlSetText, %campoPrecioActual%, %multiplied%, %ventanaPrecios%
     Send, {F10}
     Sleep, 150
     Send, {F10}
@@ -405,6 +406,7 @@ MultiplicarPrecio98o99(mult:=0){
     multiplied = % Round(multiplied, 2) ;Tango sólo quiere 2 decimales.
     
     LogPriceChange(itemID, oldPrice, multiplied, mult)
+    
     ControlSetText, %campoPrecioActual%, %multiplied%, %ventanaPrecios%
     Send, {F10}
     Sleep, 150
@@ -453,11 +455,11 @@ LazySincronizarArticulosPrecio(){ ;Intento rudimentario para arreglar la desincr
 
 SincronizadosArticulosPrecio(){
     if(not WinExist(ventanaPrecios)){
-        MsgBox No existe %ventanaPrecios%.
+        MsgBox SincronizadosArticulosPrecio - No existe %ventanaPrecios%.
         return false
     }
     if(not WinExist(ventanaArticulos)){
-        MsgBox No existe %ventanaArticulos%.
+        MsgBox SincronizadosArticulosPrecio - No existe %ventanaArticulos%.
         return false
     }
     
@@ -580,9 +582,9 @@ LogSend(finalText := ""){
 ;{ Opciones
 Menu, Tray, Add  ; Add a separator line.
 
-Menu, Tray, Add, No Decimals, NoDecimals
+Menu, Tray, Add, No Decimals, toggleNoDecimals
 toggleNoDecimals(){
-    if (parseNoDecimals == true){
+    if(parseNoDecimals == true){
         Menu, Tray, Uncheck, No Decimals
         parseNoDecimals := false
     }
@@ -705,7 +707,7 @@ IsNum( str ) { ;Fuck AHK.
 	return false
 }
 
-IsAlwaysOnTop( Window ) {
+IsAlwaysOnTop(Window) {
     WinGet, Estilo, ExStyle, %Window%
     Return (Estilo & 0x8) ; 0x8 is WS_EX_TOPMOST.
 }
@@ -719,7 +721,7 @@ return
 ;}
 
 ;{ Opciones - post autoexec
-NoDecimals:
+toggleNoDecimals:
 toggleNoDecimals()
 return
 
@@ -764,7 +766,8 @@ return
 ;{ Keybinds
 Launch_Media::
 ;EliminacionArticulo()
-msgbox, Testing...
+;PegarUnidadMedidaVentas()
+Msgbox, Testing...
 return
 
 Volume_Up::
@@ -816,11 +819,6 @@ Clipboard := GetUnidadMedidaVentas()
 ;CorregirUnidadMedidaVentas("Ferrolux")
 Sleep,100
 BuscarPorPortapapel()
-;Sleep, 100
-;Send, {Esc}
-;Send, {Left}
-;Send, {Left}
-;Send, ^c
 return
 
 Browser_Home::
@@ -831,10 +829,3 @@ return
 PegarPrecio98o99(multiplicadorPrecio2)
 return
 ;}
-
-#IfWinActive SOS DE STOCK ; Works for EGRESOS and INGRESOS. AHK does not have an OR operand for this command.
-::cdm::Cambio de Mercadería - Blas
-::cds::Corrección de Stock - Blas
-::mui::Roto/Uso Interno - Blas
-::-b:: - Blas
-#IfWinActive
