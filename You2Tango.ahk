@@ -518,6 +518,14 @@ BuscarPorPortapapel(){
         if(PicExists("Images/OpenOfficeCalc/EndOf.png")){ ;Damn you, OpenOffice.
             Send, {Enter}
         }
+        Sleep, 100
+        if(PicExists("Images/OpenOfficeCalc/NotFound.png")){ ;Damn you, OpenOffice.
+            Send, {Enter}
+            OnUnsuccessfulSearch()
+        }
+        else{
+            OnSuccessfulSearch()
+        }
     }
     if WinExist("Adobe Reader"){
         WinActivate, Adobe Reader
@@ -526,6 +534,11 @@ BuscarPorPortapapel(){
         Sleep, 100
         Send, ^v{Enter} ;Ctrl+V+Enter
     }
+}
+
+OnUnsuccessfulSearch(){
+}
+OnSuccessfulSearch(){
 }
 
 CerrarVentanaBuscar(){
