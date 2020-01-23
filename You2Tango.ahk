@@ -27,6 +27,9 @@ global ventanaBuscar := "ahk_class TFrmBuscar"
 global campoContenido_Buscar := "TcxCustomInnerTextEdit1"
 global checkboxFiltrar := "TCheckBox4"
 global checkboxIncremental := "TCheckBox3"
+global buscarEn := "TComboBox1"
+global buscarCodigo := 1
+global buscarSinonimo := 4
 
 global ventanaIngresosStock := "INGRESOS DE STOCK"
 global ventanaEgresosStock := "EGRESOS DE STOCK"
@@ -49,6 +52,9 @@ global search_Solnic = "Solnic"
 global searchType := "Default"
 
 global parseNoDecimals := false
+
+global enableCodeArray := true
+global codeArray := []
 ;}
 
 ;{ Ventana Artículos - Helpers
@@ -144,6 +150,19 @@ AceptarCambiosVentanaArticulos(){
     ControlSend, %campoOKchild_1%, {F10}, %ventanaArticulos_OKchild%
     WinWait, %ventanaArticulos_OKchild%
     ControlSend, %campoOKchild_2%, {F10}, %ventanaArticulos_OKchild%
+}
+
+GoToVentanaArticulos(num := "", searchType := 0){
+    WinMenuSelectItem, %ventanaArticulos%, , Buscar, Por Clave
+    WinWait, %ventanaBuscar%
+    if(searchType != 0){
+        setSearchTypeVentanaBuscar(searchType)
+    }
+    
+    ControlFocus, %campoContenido_Buscar%, %ventanaBuscar% ;Si no hacemos focus, Tango no detecta que hicimos algún cambio.
+Control, EditPaste, %num%, %campoContenido_Buscar%, %ventanaBuscar%
+
+    CerrarVentanaBuscar()
 }
 ;}
 
@@ -308,6 +327,16 @@ GetCodigoVentanaPrecios(){
     }
     return itemID
 }
+
+GoToVentanaPrecios(num := ""){
+    WinMenuSelectItem, %ventanaPrecios%, , Buscar, Por Clave
+    WinWait, %ventanaBuscar%
+    
+    ControlFocus, %campoContenido_Buscar%, %ventanaBuscar% ;Si no hacemos focus, Tango no detecta que hicimos algún cambio.
+Control, EditPaste, %num%, %campoContenido_Buscar%, %ventanaBuscar%
+
+    CerrarVentanaBuscar()
+}
 ;}
 
 ;{ Ventana Precios - Funciones
@@ -433,11 +462,8 @@ SincronizarArticulosPrecio(){
     }
 
     CodigoArticulo := GetCodigoVentanaArticulos()
-    WinMenuSelectItem, %ventanaPrecios%, , Buscar, Por Clave
-    WinWait, %ventanaBuscar% ;Ésta es la ventana Buscar.
-    ControlSend, %campoContenido_Buscar%, %CodigoArticulo%, %ventanaBuscar% 
     
-    CerrarVentanaBuscar()
+    GoToVentanaPrecios(CodigoArticulo)
 }
 
 LazySincronizarArticulosPrecio(){ ;Intento rudimentario para arreglar la desincronización
@@ -479,23 +505,45 @@ SincronizadosArticulosPrecio(){
 }
 
 ProximoArticulo(){ 
-    if(WinExist(ventanaArticulos)){
-        WinMenuSelectItem, %ventanaArticulos%, , Buscar, Siguiente
+    if(enableCodeArray and CodeArray.Length() > 0 and WinExist(ventanaArticulos) and WinExist(ventanaPrecios)){
+        next := NextFromArray(CodeArray, GetCodigoVentanaArticulos())
     }
-    if(WinExist(ventanaPrecios)){
-        WinMenuSelectItem, %ventanaPrecios%, , Buscar, Siguiente
+    
+    if(next){
+        GoToVentanaArticulos(next, buscarCodigo)
+        SincronizarArticulosPrecio()
     }
-    LazySincronizarArticulosPrecio()
+    else{
+        if(WinExist(ventanaArticulos)){
+            WinMenuSelectItem, %ventanaArticulos%, , Buscar, Siguiente
+        }
+        if(WinExist(ventanaPrecios)){
+            WinMenuSelectItem, %ventanaPrecios%, , Buscar, Siguiente
+        }
+        LazySincronizarArticulosPrecio()
+    }   
 }
 
 AnteriorArticulo(){
-    if(WinExist(ventanaArticulos)){
-        WinMenuSelectItem, %ventanaArticulos%, , Buscar, Anterior
+    if(enableCodeArray and CodeArray.Length() > 0 and WinExist(ventanaArticulos) and WinExist(ventanaPrecios)){
+        prev := PrevFromArray(CodeArray, GetCodigoVentanaArticulos())
     }
-    if(WinExist(ventanaPrecios)){
-        WinMenuSelectItem, %ventanaPrecios%, , Buscar, Anterior
+    
+    if(prev){
+        GoToVentanaArticulos(prev, buscarCodigo)
+        SincronizarArticulosPrecio()
     }
-    LazySincronizarArticulosPrecio()
+    else{
+        if(WinExist(ventanaArticulos)){
+            WinMenuSelectItem, %ventanaArticulos%, , Buscar, Anterior
+        }
+        if(WinExist(ventanaPrecios)){
+            WinMenuSelectItem, %ventanaPrecios%, , Buscar, Anterior
+        }
+        LazySincronizarArticulosPrecio()
+    }   
+    
+
 }
 ;}
 
@@ -539,6 +587,14 @@ BuscarPorPortapapel(){
 OnUnsuccessfulSearch(){
 }
 OnSuccessfulSearch(){
+}
+
+GetSearchTypeVentanaBuscar(){
+    ControlGetText, searchType, %buscarEn%, %ventanaBuscar%
+    return searchType
+}
+SetSearchTypeVentanaBuscar(searchType){
+    Control, Choose, %searchType%, %buscarEn%, %ventanaBuscar%
 }
 
 CerrarVentanaBuscar(){
@@ -608,6 +664,41 @@ toggleNoDecimals(){
     else{
         Menu, Tray, Check, No Decimals
         parseNoDecimals := true
+    }
+}
+
+Menu, Tray, Add  ; Add a separator line.
+
+Menu, Tray, Add, Import CodeArray..., importCodeArray
+importCodeArray(){
+    FileSelectFile, archivo, 3, %A_Desktop%, Select a .txt document..., Text Documents (*.txt)
+    if(archivo = ""){
+        return
+    }
+    
+    codeArray := []
+    Loop, read, %archivo%
+    {
+        Loop, parse, A_LoopReadLine, %A_Tab%
+        {
+            if(RegExMatch(A_LoopField, "^[\d*]+", match)){
+                codeArray.Push(match)
+            }
+        }
+    }
+    
+    MsgBox, , Import result:, % StrJoin(CodeArray, ", ")
+}
+
+Menu, Tray, Add, Disable CodeArray, toggleCodeArray
+toggleCodeArray(){
+    if(enableCodeArray == true){
+        Menu, Tray, Check, Disable CodeArray
+        enableCodeArray := false
+    }
+    else{
+        Menu, Tray, Uncheck, Disable CodeArray
+        enableCodeArray := true
     }
 }
 
@@ -720,7 +811,33 @@ AllRegexMatches(haystack, needle){
     return Matches
 }
 
-IsNum( str ) { ;Fuck AHK.
+NextFromArray(arr, num){
+    nextnum =
+    for index, nextnum in arr{
+        if(nextnum > num){
+            return nextnum
+        }
+    }
+}
+
+PrevFromArray(arr, num){
+    prevnum =
+    for index, nextnum in arr{
+        if(nextnum >= num){
+            return prevnum
+        }
+        prevnum := nextnum
+    }
+}
+
+StrJoin(arr, del) {
+    Result := ""
+    for each, val in arr
+        Result .= val del
+    return RTrim(Result, del)
+}
+
+IsNum(str) { ;Fuck AHK.
 	if str is number
 		return true
 	return false
@@ -742,6 +859,14 @@ return
 ;{ Opciones - post autoexec
 toggleNoDecimals:
 toggleNoDecimals()
+return
+
+toggleCodeArray:
+toggleCodeArray()
+return
+
+importCodeArray:
+importCodeArray()
 return
 
 setSearchDefault:
