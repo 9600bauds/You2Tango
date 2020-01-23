@@ -43,8 +43,9 @@ global search_Start = "Match Start"
 global search_End = "Match End"
 global search_RemoveLastWord = "Remove Last Word"
 global search_LongestNumber = "Longest Number"
-global search_Faroluz = "Faroluz"
 global search_Fabrimport = "Fabrimport"
+global search_Faroluz = "Faroluz"
+global search_Solnic = "Solnic"
 global searchType := "Default"
 
 global parseNoDecimals := false
@@ -81,11 +82,14 @@ GetUnidadMedidaVentas(postSearch := true){
             }
             unidadMedida := longestMatch
         }
+        else if(searchType == search_Fabrimport){
+            unidadMedida := "[^0-9]" . unidadMedida . "$"
+        }
         else if(searchType == search_Faroluz){
             unidadMedida := RegExReplace(unidadMedida, " \w+$", "") . "$"
         }
-        else if(searchType == search_Fabrimport){
-            unidadMedida := "[^0-9]" . unidadMedida . "$"
+        else if(searchType == search_Solnic){
+            unidadMedida := "^" . unidadMedida . "[\s+|$]"
         }
     }
         
@@ -602,8 +606,9 @@ Menu, searchTypeMenu, Add, %search_Start%, setSearchStart, Radio
 Menu, searchTypeMenu, Add, %search_End%, setSearchEnd, Radio
 Menu, searchTypeMenu, Add, %search_RemoveLastWord%, setSearchRemoveLastWord, Radio
 Menu, searchTypeMenu, Add, %search_LongestNumber%, setSearchLongestNumber, Radio
-Menu, searchTypeMenu, Add, %search_Faroluz%, setSearchFaroluz, Radio
 Menu, searchTypeMenu, Add, %search_Fabrimport%, setSearchFabrimport, Radio
+Menu, searchTypeMenu, Add, %search_Faroluz%, setSearchFaroluz, Radio
+Menu, searchTypeMenu, Add, %search_Solnic%, setSearchSolnic, Radio
 setSearchType(search_Default)
 
 setSearchType(type){
@@ -615,8 +620,9 @@ setSearchType(type){
     Menu, searchTypeMenu, Uncheck, %search_End%
     Menu, searchTypeMenu, Uncheck, %search_RemoveLastWord%
     Menu, searchTypeMenu, Uncheck, %search_LongestNumber%
-    Menu, searchTypeMenu, Uncheck, %search_Faroluz%
     Menu, searchTypeMenu, Uncheck, %search_Fabrimport%
+    Menu, searchTypeMenu, Uncheck, %search_Faroluz%
+    Menu, searchTypeMenu, Uncheck, %search_Solnic%
     Menu, searchTypeMenu, Check, %type%
     
 }
@@ -749,13 +755,16 @@ setSearchLongestNumber:
 setSearchType(search_LongestNumber)
 return
 
+setSearchFabrimport:
+setSearchType(search_Fabrimport)
+return
 
 setSearchFaroluz:
 setSearchType(search_Faroluz)
 return
 
-setSearchFabrimport:
-setSearchType(search_Fabrimport)
+setSearchSolnic:
+setSearchType(search_Solnic)
 return
 
 Exit:
