@@ -505,8 +505,12 @@ SincronizadosArticulosPrecio(){
 }
 
 ProximoArticulo(){ 
+    next =
     if(enableCodeArray and CodeArray.Length() > 0 and WinExist(ventanaArticulos) and WinExist(ventanaPrecios)){
         next := NextFromArray(CodeArray, GetCodigoVentanaArticulos())
+        if (next == GetCodigoVentanaArticulos() + 1){
+            next = ;just go forward normally
+        }
     }
     
     if(next){
@@ -525,8 +529,12 @@ ProximoArticulo(){
 }
 
 AnteriorArticulo(){
+    prev =
     if(enableCodeArray and CodeArray.Length() > 0 and WinExist(ventanaArticulos) and WinExist(ventanaPrecios)){
         prev := PrevFromArray(CodeArray, GetCodigoVentanaArticulos())
+        if (prev == GetCodigoVentanaArticulos() - 1){
+            prev = ;just go backwards normally
+        }
     }
     
     if(prev){
