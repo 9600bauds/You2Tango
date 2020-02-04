@@ -895,6 +895,10 @@ toggleNoDecimals:
 toggleNoDecimals()
 return
 
+setPostSearchString:
+setPostSearchString()
+return
+
 toggleCodeArray:
 toggleCodeArray()
 return
