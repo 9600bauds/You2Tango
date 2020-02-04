@@ -414,6 +414,7 @@ PegarPrecio98o99(mult:=1){
             Sleep, 150
             Send, {F10}
             return
+            return 0
         }
     }
     LogPriceChange(itemID, oldPrice, multiplied, mult)
@@ -422,6 +423,7 @@ PegarPrecio98o99(mult:=1){
     Send, {F10}
     Sleep, 150
     Send, {F10}
+    return 1
 }
 
 MultiplicarPrecio98o99(mult:=0){
@@ -587,9 +589,11 @@ BuscarPorPortapapel(){
         if(PicExists("Images/OpenOfficeCalc/NotFound.png")){ ;Damn you, OpenOffice.
             Send, {Enter}
             OnUnsuccessfulSearch()
+            return 0
         }
         else{
             OnSuccessfulSearch()
+            return 1
         }
     }
     if WinExist(ventanaAdobeReader){
