@@ -60,10 +60,11 @@ global parseNoDecimals := false
 
 global enableCodeArray := true
 global codeArray := []
+global PostSearchString := ""
 ;}
 
 ;{ Ventana Artículos - Helpers
-GetUnidadMedidaVentas(postSearch := true){
+GetUnidadMedidaVentas(searchAfter := true){
     if(not WinExist(ventanaArticulos)){
         MsgBox No existe %ventanaArticulos%.
         return
@@ -71,7 +72,7 @@ GetUnidadMedidaVentas(postSearch := true){
 
     ControlGetText, unidadMedida, %campoMedidaVentas%, %ventanaArticulos%
     
-    if(postSearch){
+    if(searchAfter){
         if(searchType == search_Exact){
             unidadMedida := "^" . unidadMedida . "$"
         }
@@ -603,6 +604,8 @@ BuscarPorPortapapel(){
 OnUnsuccessfulSearch(){
 }
 OnSuccessfulSearch(){
+    WinActivate, %ventanaCalc_Main%
+    Send, %PostSearchString%
 }
 
 GetSearchTypeVentanaBuscar(){
@@ -681,6 +684,19 @@ toggleNoDecimals(){
         Menu, Tray, Check, No Decimals
         parseNoDecimals := true
     }
+}
+
+Menu, Tray, Add  ; Add a separator line.
+
+Menu, Tray, Add, Post-Search Commands..., setPostSearchString
+setPostSearchString(){
+    instructions := "Write out a set of instructions to send after a successful search.`rEach instruction must be between curly brackets, such as: {Right}`rAdd a number after your instruction to make it repeat that many times.`rSyntax is the same as AutoHotKey's Send command."
+    InputBox, tempString, Post-Search Commands, %instructions%, , , , , , , , {}
+    if(ErrorLevel or tempString == "" or tempString == "{}"){
+        return
+    }
+    PostSearchString := tempString
+    MsgBox, %PostSearchString%
 }
 
 Menu, Tray, Add  ; Add a separator line.
