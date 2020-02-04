@@ -52,6 +52,7 @@ global search_RemoveLastWord = "Remove Last Word"
 global search_LongestNumber = "Longest Number"
 global search_Fabrimport = "Fabrimport"
 global search_Faroluz = "Faroluz"
+global search_Ferrolux = "Ferrolux"
 global search_Solnic = "Solnic"
 global searchType := "Default"
 
@@ -97,6 +98,9 @@ GetUnidadMedidaVentas(postSearch := true){
         }
         else if(searchType == search_Faroluz){
             unidadMedida := RegExReplace(unidadMedida, " \w+$", "") . "$"
+        }
+        else if(searchType == search_Ferrolux){
+            RegExMatch(unidadMedida, "([A-Z]+-\d+)", unidadMedida)
         }
         else if(searchType == search_Solnic){
             unidadMedida := "^" . unidadMedida . "[\s+|$]"
@@ -724,6 +728,7 @@ Menu, searchTypeMenu, Add, %search_RemoveLastWord%, setSearchRemoveLastWord, Rad
 Menu, searchTypeMenu, Add, %search_LongestNumber%, setSearchLongestNumber, Radio
 Menu, searchTypeMenu, Add, %search_Fabrimport%, setSearchFabrimport, Radio
 Menu, searchTypeMenu, Add, %search_Faroluz%, setSearchFaroluz, Radio
+Menu, searchTypeMenu, Add, %search_Ferrolux%, setSearchFerrolux, Radio
 Menu, searchTypeMenu, Add, %search_Solnic%, setSearchSolnic, Radio
 setSearchType(search_Default)
 
@@ -738,6 +743,7 @@ setSearchType(type){
     Menu, searchTypeMenu, Uncheck, %search_LongestNumber%
     Menu, searchTypeMenu, Uncheck, %search_Fabrimport%
     Menu, searchTypeMenu, Uncheck, %search_Faroluz%
+    Menu, searchTypeMenu, Uncheck, %search_Ferrolux%
     Menu, searchTypeMenu, Uncheck, %search_Solnic%
     Menu, searchTypeMenu, Check, %type%
     
@@ -911,6 +917,10 @@ return
 
 setSearchFaroluz:
 setSearchType(search_Faroluz)
+return
+
+setSearchFerrolux:
+setSearchType(search_Ferrolux)
 return
 
 setSearchSolnic:
