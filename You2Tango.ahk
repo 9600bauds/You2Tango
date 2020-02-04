@@ -60,6 +60,9 @@ global parseNoDecimals := false
 
 global enableCodeArray := true
 global codeArray := []
+
+global AdHocMode := false
+
 global PostSearchString := ""
 ;}
 
@@ -413,7 +416,6 @@ PegarPrecio98o99(mult:=1){
             Send, {Esc}
             Sleep, 150
             Send, {F10}
-            return
             return 0
         }
     }
@@ -697,6 +699,20 @@ toggleNoDecimals(){
 
 Menu, Tray, Add  ; Add a separator line.
 
+Menu, Tray, Add, AdHocmode, toggleAdHocmode
+toggleAdHocMode(){
+    if(AdHocMode == true){
+        Menu, Tray, Uncheck, AdHocmode
+        AdHocMode := false
+    }
+    else{
+        Menu, Tray, Check, AdHocmode
+        AdHocMode := true
+    }
+}
+
+Menu, Tray, Add  ; Add a separator line.
+
 Menu, Tray, Add, Post-Search Commands..., setPostSearchString
 setPostSearchString(){
     instructions := "Write out a set of instructions to send after a successful search.`rEach instruction must be between curly brackets, such as: {Right}`rAdd a number after your instruction to make it repeat that many times.`rSyntax is the same as AutoHotKey's Send command."
@@ -892,6 +908,26 @@ IsAlwaysOnTop(Window) {
 }
 ;}
 
+;{ AdHoc
+AdHoc(mult){
+    if(not SincronizadosArticulosPrecio()){
+        SincronizarArticulosPrecio()
+        return
+    }
+    WinActivate, %ventanaCalc_Main%
+    Send {Ctrl Down}c{Ctrl Up}
+    if(not PegarPrecio98o99(mult)){
+        return
+    }
+    ProximoArticulo()
+    Clipboard := GetUnidadMedidaVentas()
+    Sleep,100
+    BuscarPorPortapapel()
+    WinActivate, %ventanaCalc_Main%
+    Send {Right 2}
+}
+;}
+
 ;{ AUTOEXEC
 if(not WinExist(ventanaNotepad)){
     Run, Notepad
@@ -902,6 +938,10 @@ return
 ;{ Opciones - post autoexec
 toggleNoDecimals:
 toggleNoDecimals()
+return
+
+toggleAdHocMode:
+toggleAdHocMode()
 return
 
 setPostSearchString:
@@ -1020,10 +1060,20 @@ BuscarPorPortapapel()
 return
 
 Browser_Home::
-PegarPrecio98o99(multiplicadorPrecio1)
+if(AdHocMode){
+    AdHoc(multiplicadorPrecio1)
+}
+else{
+    PegarPrecio98o99(multiplicadorPrecio1)
+}
 return
 
 ^Browser_Home::
-PegarPrecio98o99(multiplicadorPrecio2)
+if(AdHocMode){
+    AdHoc(multiplicadorPrecio2)
+}
+else{
+    PegarPrecio98o99(multiplicadorPrecio2)
+}
 return
 ;}
