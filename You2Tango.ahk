@@ -468,8 +468,13 @@ SincronizarArticulosPrecio(){
         MsgBox No existe %ventanaArticulos%.
         return
     }
+    
     if(WinExist(ventanaBuscar)){
         CerrarVentanaBuscar()
+    }
+    
+    if(SincronizadosArticulosPrecio()){
+        return
     }
 
     CodigoArticulo := GetCodigoVentanaArticulos()
