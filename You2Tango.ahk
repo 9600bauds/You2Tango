@@ -35,6 +35,10 @@ global ventanaIngresosStock := "INGRESOS DE STOCK"
 global ventanaEgresosStock := "EGRESOS DE STOCK"
 
 global ventanaNotepad := "ahk_class Notepad"
+global ventanaCalc := "OpenOffice Calc"
+global ventanaCalc_Buscar := "Find & Replace"
+global ventanaCalc_Main := "ahk_class SALFRAME" ; Precisamente la planilla principal, no ningún diálogo
+global ventanaAdobeReader := "Adobe Reader"
 
 global multiplicadorPrecio1 := 1.21
 global multiplicadorPrecio2 := 1
@@ -557,10 +561,10 @@ AnteriorArticulo(){
 
 ;{ Ventana Buscar
 BuscarPorPortapapel(){
-    if WinExist("OpenOffice Calc"){
-        WinActivate, OpenOffice Calc
-        WinWait, OpenOffice Calc
-        if WinExist("Find & Replace"){
+    if WinExist(ventanaCalc){
+        WinActivate, %ventanaCalc%
+        WinWait, %ventanaCalc%
+        if WinExist(ventanaCalc_Buscar){
             WinActivate, Find & Replace
             WinWait, Find & Replace
             Send, !s ;Alt+S: Search For
@@ -583,9 +587,9 @@ BuscarPorPortapapel(){
             OnSuccessfulSearch()
         }
     }
-    if WinExist("Adobe Reader"){
-        WinActivate, Adobe Reader
-        WinWait, Adobe Reader
+    if WinExist(ventanaAdobeReader){
+        WinActivate, %ventanaAdobeReader%
+        WinWait, %ventanaAdobeReader%
         Send, ^f ;Ctrl+F: Buscar
         Sleep, 100
         Send, ^v{Enter} ;Ctrl+V+Enter
