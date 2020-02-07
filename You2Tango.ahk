@@ -744,7 +744,13 @@ importCodeArray(){
         }
     }
     
-    MsgBox, , Import result:, % StrJoin(CodeArray, ", ")
+    array2text := StrJoin(CodeArray, ", ")
+    MsgBox, 305, CodeArray Import, Import result:`r%array2text%`r`rGo to first entry? ;1+48+256
+    IfMsgBox, OK
+    {
+        GoToVentanaArticulos(CodeArray[1], buscarCodigo)
+        SincronizarArticulosPrecio()
+    }
 }
 
 Menu, Tray, Add, Disable CodeArray, toggleCodeArray
