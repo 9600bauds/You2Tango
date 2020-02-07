@@ -525,6 +525,10 @@ SincronizadosArticulosPrecio(){
 ProximoArticulo(){ 
     next =
     if(enableCodeArray and CodeArray.Length() > 0 and WinExist(ventanaArticulos) and WinExist(ventanaPrecios)){
+        if(GetCodigoVentanaArticulos() == CodeArray[CodeArray.MaxIndex()]){
+            MsgBox Already at last element in CodeArray.
+            return
+        }
         next := NextFromArray(CodeArray, GetCodigoVentanaArticulos())
         if (next == GetCodigoVentanaArticulos() + 1){
             next = ;just go forward normally
@@ -549,6 +553,10 @@ ProximoArticulo(){
 AnteriorArticulo(){
     prev =
     if(enableCodeArray and CodeArray.Length() > 0 and WinExist(ventanaArticulos) and WinExist(ventanaPrecios)){
+        if(GetCodigoVentanaArticulos() == CodeArray[1]){
+            MsgBox Already at first element in CodeArray.
+            return
+        }
         prev := PrevFromArray(CodeArray, GetCodigoVentanaArticulos())
         if (prev == GetCodigoVentanaArticulos() - 1){
             prev = ;just go backwards normally
