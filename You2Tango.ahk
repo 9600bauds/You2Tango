@@ -172,7 +172,7 @@ GoToVentanaArticulos(num := "", searchType := 0){
     }
     
     ControlFocus, %campoContenido_Buscar%, %ventanaBuscar% ;Si no hacemos focus, Tango no detecta que hicimos algún cambio.
-Control, EditPaste, %num%, %campoContenido_Buscar%, %ventanaBuscar%
+    Control, EditPaste, %num%, %campoContenido_Buscar%, %ventanaBuscar%
 
     CerrarVentanaBuscar()
 }
@@ -226,7 +226,7 @@ ActualizarDescripFecha(doAfter:="", replacement:=""){
 }
 
 MassActualizarDesc(){
-    arr = 1578,2134,3758,5638,6544,500,2886
+    arr = 566780,566781,566782,566783,566784,567458,567459,567460,567462,567467,567468,567469,567471,567481,596521,661499,661502,784549,804023,873333,874863,874864,874866,874867,874868,874869,874870,874890,875286,875288,876373,876374,876531,878520,878576,890755,893709,893710,893712,893731,896614,896615,896631,896633,896636,900363,900365,900370,961503,961504,991500,991501
     
     if(not WinExist(ventanaArticulos)){
         MsgBox MassActualizarDesc - No existe %ventanaArticulos%.
@@ -345,7 +345,7 @@ GoToVentanaPrecios(num := ""){
     WinWait, %ventanaBuscar%
     
     ControlFocus, %campoContenido_Buscar%, %ventanaBuscar% ;Si no hacemos focus, Tango no detecta que hicimos algún cambio.
-Control, EditPaste, %num%, %campoContenido_Buscar%, %ventanaBuscar%
+    Control, EditPaste, %num%, %campoContenido_Buscar%, %ventanaBuscar%
 
     CerrarVentanaBuscar()
 }
@@ -599,8 +599,8 @@ BuscarPorPortapapel(){
         Sleep, 100
         if(PicExists("Images/OpenOfficeCalc/EndOf.png")){ ;Damn you, OpenOffice.
             Send, {Enter}
+            Sleep, 100
         }
-        Sleep, 100
         if(PicExists("Images/OpenOfficeCalc/NotFound.png")){ ;Damn you, OpenOffice.
             Send, {Enter}
             OnUnsuccessfulSearch()
@@ -753,6 +753,7 @@ importCodeArray(){
     }
     
     array2text := StrJoin(CodeArray, ", ")
+    ;Clipboard := StrJoin(CodeArray, ",")
     MsgBox, 305, CodeArray Import, Import result:`r%array2text%`r`rGo to first entry? ;1+48+256
     IfMsgBox, OK
     {
@@ -935,7 +936,7 @@ AdHoc(mult){
     }
     ProximoArticulo()
     Clipboard := GetUnidadMedidaVentas()
-    Sleep,100
+    Sleep, 100
     BuscarPorPortapapel()
     WinActivate, %ventanaCalc_Main%
 }
@@ -1018,7 +1019,12 @@ return
 Launch_Media::
 ;EliminacionArticulo()
 ;PegarUnidadMedidaVentas()
-Msgbox, Testing...
+;MassActualizarDesc()
+;Msgbox, Testing...
+return
+
+^Launch_Media::
+ListLines 
 return
 
 Volume_Up::
