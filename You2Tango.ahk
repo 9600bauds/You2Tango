@@ -549,17 +549,20 @@ ProximoArticulo(){
     }
     
     if(next){
-        GoToVentanaArticulos(next, buscarCodigo)
-        SincronizarArticulosPrecio()
+        GoToAll(next)
     }
     else{
         if(WinExist(ventanaArticulos)){
             WinMenuSelectItem, %ventanaArticulos%, , Buscar, Siguiente
+            WinMenuSelectItem, %ventanaArticulos%, , Buscar, Siguiente
+            WinMenuSelectItem, %ventanaArticulos%, , Buscar, Siguiente
         }
         if(WinExist(ventanaPrecios)){
             WinMenuSelectItem, %ventanaPrecios%, , Buscar, Siguiente
+            WinMenuSelectItem, %ventanaPrecios%, , Buscar, Siguiente
+            WinMenuSelectItem, %ventanaPrecios%, , Buscar, Siguiente
         }
-        LazySincronizarArticulosPrecio()
+        ;LazySincronizarArticulosPrecio()
     }   
 }
 
@@ -577,20 +580,41 @@ AnteriorArticulo(){
     }
     
     if(prev){
-        GoToVentanaArticulos(prev, buscarCodigo)
-        SincronizarArticulosPrecio()
+        GoToAll(prev)
     }
     else{
         if(WinExist(ventanaArticulos)){
             WinMenuSelectItem, %ventanaArticulos%, , Buscar, Anterior
+            WinMenuSelectItem, %ventanaArticulos%, , Buscar, Anterior
+            WinMenuSelectItem, %ventanaArticulos%, , Buscar, Anterior
         }
         if(WinExist(ventanaPrecios)){
             WinMenuSelectItem, %ventanaPrecios%, , Buscar, Anterior
+            WinMenuSelectItem, %ventanaPrecios%, , Buscar, Anterior
+            WinMenuSelectItem, %ventanaPrecios%, , Buscar, Anterior
         }
-        LazySincronizarArticulosPrecio()
+        ;LazySincronizarArticulosPrecio()
     }   
     
 
+}
+
+GoToAll(codigo){
+    WinMenuSelectItem, %ventanaArticulos%, , Buscar, Por Clave
+    WinMenuSelectItem, %ventanaPrecios%, , Buscar, Por Clave
+    
+    WinWait, %ventanaBuscar_Articulos%
+    ControlFocus, %campoContenido_Buscar%, %ventanaBuscar_Articulos% ;Si no hacemos focus, Tango no detecta que hicimos algún cambio.
+    Control, EditPaste, %codigo%, %campoContenido_Buscar%, %ventanaBuscar_Articulos%
+    
+    WinWait, %ventanaBuscar_Precios%
+    ControlFocus, %campoContenido_Buscar%, %ventanaBuscar_Precios% ;Si no hacemos focus, Tango no detecta que hicimos algún cambio.
+    Control, EditPaste, %codigo%, %campoContenido_Buscar%, %ventanaBuscar_Precios%
+    
+    WinWait, %ventanaBuscar_Articulos%
+    ControlSend,, {Enter 2}, %ventanaBuscar_Articulos%
+    WinWait, %ventanaBuscar_Precios%
+    ControlSend,, {Enter 2}, %ventanaBuscar_Precios%
 }
 ;}
 
@@ -787,13 +811,17 @@ importCodeArray(){
     }
     
     array2text := StrJoin(CodeArray, ", ")
-    ;Clipboard := StrJoin(CodeArray, ",")
     MsgBox, 305, CodeArray Import, Import result:`r%array2text%`r`rGo to first entry? ;1+48+256
     IfMsgBox, OK
     {
-        GoToVentanaArticulos(CodeArray[1], buscarCodigo)
-        SincronizarArticulosPrecio()
+        GoToAll(CodeArray[1])
     }
+}
+
+Menu, Tray, Add, CodeArray To Clipboard, copyCodeArray
+copyCodeArray(){
+    Clipboard := StrJoin(CodeArray, ", ")
+    MsgBox, Copied:`n%Clipboard%
 }
 
 Menu, Tray, Add, Disable CodeArray, toggleCodeArray
