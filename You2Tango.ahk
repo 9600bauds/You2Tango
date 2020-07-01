@@ -802,17 +802,48 @@ toggleCodeArray(){
 }
 
 Menu, Tray, Add  ; Add a separator line.
-
+;{
 Menu, searchTypeMenu, Add, %search_Default%, setSearchDefault, Radio
+setSearchDefault(){
+    setSearchType(search_Default)
+}
 Menu, searchTypeMenu, Add, %search_Exact%, setSearchExact, Radio
+setSearchExact(){
+    setSearchType(search_Exact)
+}
 Menu, searchTypeMenu, Add, %search_Start%, setSearchStart, Radio
+setSearchStart(){
+    setSearchType(search_Start)
+}
 Menu, searchTypeMenu, Add, %search_End%, setSearchEnd, Radio
+setSearchEnd(){
+    setSearchType(search_End)
+}
 Menu, searchTypeMenu, Add, %search_RemoveLastWord%, setSearchRemoveLastWord, Radio
+setSearchRemoveLastWord(){
+    setSearchType(search_RemoveLastWord)
+}
 Menu, searchTypeMenu, Add, %search_LongestNumber%, setSearchLongestNumber, Radio
+setSearchLongestNumber(){
+    setSearchType(search_LongestNumber)
+}
 Menu, searchTypeMenu, Add, %search_Fabrimport%, setSearchFabrimport, Radio
+setSearchFabrimport(){
+    setSearchType(search_Fabrimport)
+}
 Menu, searchTypeMenu, Add, %search_Faroluz%, setSearchFaroluz, Radio
+setSearchFaroluz(){
+    setSearchType(search_Faroluz)
+}
 Menu, searchTypeMenu, Add, %search_Ferrolux%, setSearchFerrolux, Radio
+setSearchFerrolux(){
+    setSearchType(search_Ferrolux)
+}
 Menu, searchTypeMenu, Add, %search_Solnic%, setSearchSolnic, Radio
+setSearchSolnic(){
+    setSearchType(search_Solnic)
+}
+;}
 setSearchType(search_Default)
 
 setSearchType(type){
@@ -973,68 +1004,6 @@ AdHoc(mult){
 if(not WinExist(ventanaNotepad)){
     Run, Notepad
 }
-return
-;}
-
-;{ Opciones - post autoexec
-toggleNoDecimals:
-toggleNoDecimals()
-return
-
-toggleAdHocMode:
-toggleAdHocMode()
-return
-
-setPostSearchString:
-setPostSearchString()
-return
-
-toggleCodeArray:
-toggleCodeArray()
-return
-
-importCodeArray:
-importCodeArray()
-return
-
-setSearchDefault:
-setSearchType(search_Default)
-return
-
-setSearchExact:
-setSearchType(search_Exact)
-return
-
-setSearchStart:
-setSearchType(search_Start)
-return
-
-setSearchEnd:
-setSearchType(search_End)
-return
-
-setSearchRemoveLastWord:
-setSearchType(search_RemoveLastWord)
-return
-
-setSearchLongestNumber:
-setSearchType(search_LongestNumber)
-return
-
-setSearchFabrimport:
-setSearchType(search_Fabrimport)
-return
-
-setSearchFaroluz:
-setSearchType(search_Faroluz)
-return
-
-setSearchFerrolux:
-setSearchType(search_Ferrolux)
-return
-
-setSearchSolnic:
-setSearchType(search_Solnic)
 return
 
 Exit:
