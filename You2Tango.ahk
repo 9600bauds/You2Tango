@@ -24,6 +24,8 @@ global campoCodigoArt_Precios_ModoModificar := "TEdit6" ;EN MODO MODIFICAR
 global campoPrecioActual := "TNumEditTg1"
 
 global ventanaBuscar := "ahk_class TFrmBuscar"
+global ventanaBuscar_Articulos := "ahk_class TFrmBuscar ahk_exe ST_1.EXE"
+global ventanaBuscar_Precios := "ahk_class TFrmBuscar ahk_exe GV_1.EXE"
 global campoContenido_Buscar := "TcxCustomInnerTextEdit1"
 global checkboxFiltrar := "TCheckBox4"
 global checkboxIncremental := "TCheckBox3"
@@ -39,6 +41,10 @@ global ventanaCalc := "OpenOffice Calc"
 global ventanaCalc_Buscar := "Find & Replace"
 global ventanaCalc_Main := "ahk_class SALFRAME" ; Precisamente la planilla principal, no ningún diálogo
 global ventanaAdobeReader := "Adobe Reader"
+global ventanaAdobeReader_Buscar := "ahk_class AVL_AVWindow"
+global ventanaAdobeReader_BuscarOK := "Button18"
+global ventanaAdobeReader_Buscar_Input := "Edit4"
+global ventanaAbodeReader_Buscar_Matches := "Static12"
 
 global multiplicadorPrecio1 := 1.21
 global multiplicadorPrecio2 := 1
@@ -120,9 +126,9 @@ CambiarCampoVentanaArticulos(field := "", newText = ""){
         return false
     }
     
-    if(WinExist(ventanaBuscar)){
-        CerrarVentanaBuscar()
-    }
+    ;if(WinExist(ventanaBuscar)){
+    ;    CerrarVentanaBuscar()
+    ;}
     
     If(!IsAlwaysOnTop(ventanaArticulos)){
         WinActivate, %ventanaArticulos%
@@ -594,9 +600,10 @@ BuscarPorPortapapel(){
         else{
             Send, ^f ;Ctrl+F: Buscar
         }
-        Sleep, 100
+        WinWait, Find & Replace
         Send, ^v{Enter} ;Ctrl+V+Enter
-        Sleep, 100
+        Sleep, 100 ;todo see if this can be done better
+        WinWait, Find & Replace
         if(PicExists("Images/OpenOfficeCalc/EndOf.png")){ ;Damn you, OpenOffice.
             Send, {Enter}
             Sleep, 100
@@ -611,12 +618,32 @@ BuscarPorPortapapel(){
             return 1
         }
     }
-    if WinExist(ventanaAdobeReader){
+    else if WinExist(ventanaAdobeReader_Buscar){
+        WinActivate, %ventanaAdobeReader_Buscar%
+        WinWait, %ventanaAdobeReader_Buscar%
+        ControlClick, %ventanaAdobeReader_BuscarOK%, %ventanaAdobeReader_Buscar%
+        WinWait, %ventanaAdobeReader_Buscar%
+        ControlFocus, %ventanaAdobeReader_Buscar_Input%, %ventanaAdobeReader_Buscar%
+        Send, ^v{Enter} ;Ctrl+V+Enter
+        WinWait, %ventanaAdobeReader_Buscar%
+        ControlGetText, resultsText, %ventanaAbodeReader_Buscar_Matches%, %ventanaAdobeReader_Buscar%
+        if(InStr(resultsText, "0 doc")){
+            OnUnsuccessfulSearch()
+            return 0
+        }
+        else{
+            OnSuccessfulSearch()
+            return 1
+        }
+        
+    }
+    else if WinExist(ventanaAdobeReader){
         WinActivate, %ventanaAdobeReader%
         WinWait, %ventanaAdobeReader%
         Send, ^f ;Ctrl+F: Buscar
         Sleep, 100
         Send, ^v{Enter} ;Ctrl+V+Enter
+        return 1
     }
 }
 
@@ -656,7 +683,7 @@ CerrarVentanaBuscar(){
     If(WinExist(ventanaBuscar)){ ;Puede que ya hayamos apretado Enter nosotros.
         Send, {Enter}
     }
-    WinWaitClose, %ventanaBuscar%
+    ;WinWaitClose, %ventanaBuscar%
 }
 ;}
 
