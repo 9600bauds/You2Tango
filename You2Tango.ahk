@@ -73,15 +73,21 @@ global PostSearchString := ""
 ;}
 
 ;{ Ventana Artículos - Helpers
-GetUnidadMedidaVentas(searchAfter := true){
+GetUnidadMedidaVentas(noModify := false){
     if(not WinExist(ventanaArticulos)){
         MsgBox No existe %ventanaArticulos%.
         return
     }
-
+       
+    WinWait, %ventanaArticulos%
     ControlGetText, unidadMedida, %campoMedidaVentas%, %ventanaArticulos%
     
-    if(searchAfter){
+    if(unidadMedida == "" or unidadMedida == "NO TRAER" or RegExMatch(unidadMedida, "$[-]+^")){
+        MsgBox, GetUnidadMedidaVentas - Unidad inválida. (%unidadMedida%)
+        return
+    }
+    
+    if(!noModify){
         if(searchType == search_Exact){
             unidadMedida := "^" . unidadMedida . "$"
         }
@@ -104,6 +110,10 @@ GetUnidadMedidaVentas(searchAfter := true){
             unidadMedida := longestMatch
         }
         else if(searchType == search_Fabrimport){
+            if(InStr(unidadMedida, "*")){
+                MsgBox, GetUnidadMedidaVentas - Salteando por asterisco. (%unidadMedida%)
+                return
+            }
             unidadMedida := "[^0-9]" . unidadMedida . "$"
         }
         else if(searchType == search_Faroluz){
@@ -268,7 +278,7 @@ CorregirUnidadMedidaVentas(prov := ""){ ;Desvergonzadamente ad-hoc. Requiere arg
         WinWait, %ventanaArticulos%
     }
     
-    initialMedidaVentas := GetUnidadMedidaVentas(false)
+    initialMedidaVentas := GetUnidadMedidaVentas(true)
     Clipboard := initialMedidaVentas
     if(prov == "Ferrolux"){
         Clipboard := RegExReplace(Clipboard, "([a-zA-Z])([1-9])","$1-$2")
@@ -993,7 +1003,11 @@ AdHoc(mult){
         return
     }
     ProximoArticulo()
-    Clipboard := GetUnidadMedidaVentas()
+    temp_medida := GetUnidadMedidaVentas()
+    if(!temp_medida){
+        return
+    }
+    Clipboard := temp_medida
     Sleep, 100
     BuscarPorPortapapel()
     WinActivate, %ventanaCalc_Main%
@@ -1062,13 +1076,21 @@ return
 ^Launch_Mail::
 SincronizarArticulosPrecio()
 Sleep, 100
-Clipboard := GetUnidadMedidaVentas()
+medida := GetUnidadMedidaVentas()
+if(!medida){
+    return
+}
+Clipboard := medida
 Sleep, 100
 BuscarPorPortapapel()
 return
 
 Browser_Search::
-Clipboard := GetUnidadMedidaVentas()
+medida := GetUnidadMedidaVentas()
+if(!medida){
+    return
+}
+Clipboard := medida
 ;CorregirUnidadMedidaVentas("Ferrolux")
 Sleep,100
 BuscarPorPortapapel()
