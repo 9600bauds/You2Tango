@@ -242,25 +242,22 @@ ActualizarDescripFecha(doAfter:="", replacement:=""){
 }
 
 MassActualizarDesc(){
-    arr = 566780,566781,566782,566783,566784,567458,567459,567460,567462,567467,567468,567469,567471,567481,596521,661499,661502,784549,804023,873333,874863,874864,874866,874867,874868,874869,874870,874890,875286,875288,876373,876374,876531,878520,878576,890755,893709,893710,893712,893731,896614,896615,896631,896633,896636,900363,900365,900370,961503,961504,991500,991501
-    
     if(not WinExist(ventanaArticulos)){
         MsgBox MassActualizarDesc - No existe %ventanaArticulos%.
         return
     }
     
-    if(not WinExist(ventanaBuscar)){
-        WinMenuSelectItem, %ventanaArticulos%, , Buscar, Por Clave
-        WinWait, %ventanaBuscar%
-    }
-    
+    explanation := "Ingrese la lista de códigos (completos, no sinónimos) a actualizar, delimitados por coma:"
+    InputBox, arr, Actualizar Fechas, %explanation%
+    StringReplace , arr, arr, %A_Space%,,All
+        
     Loop, parse, arr, `,,
     {
-        ActualizarDescripFecha("search")
+        GoToVentanaArticulos(A_LoopField, buscarCodigo)
         Sleep, 250
-        Send, %A_LoopField%
+        ActualizarDescripFecha()
+        Sleep, 250
     }
-    ActualizarDescripFecha()
 }
 
 CorregirUnidadMedidaVentas(prov := ""){ ;Desvergonzadamente ad-hoc. Requiere argumento.
@@ -1029,7 +1026,7 @@ return
 Launch_Media::
 ;EliminacionArticulo()
 ;PegarUnidadMedidaVentas()
-;MassActualizarDesc()
+MassActualizarDesc()
 ;Msgbox, Testing...
 return
 
