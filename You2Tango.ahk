@@ -13,10 +13,14 @@ global campoMedidaVentas := "TEdit4"
 global campoCodigoArt_Articulos := "TEdit11"
 global campoDescAdicional := "TEdit8"
 global campoDesc_Articulos := "TEdit9"
+global campoCodBarra := "TEdit6"
 
 global ventanaArticulos_OKchild := "ahk_class TFormChildTg"
 global campoOKChild_1 := "TNumEditTg4" ;the long awaited comeback to OK boomer
 global campoOKChild_2 := "TEdit4"
+
+global ventanaProveedor := "Proveedores Asociados"
+global campoCodigoProveedor := "TEdit3"
 
 global ventanaPrecios := "ACTUALIZACION DE PRECIOS INDIVIDUAL POR ARTICULO"
 global campoCodigoArt_Precios_ModoNoModificar := "TEdit2" ;EN MODO NO MODIFICAR
@@ -285,6 +289,38 @@ CorregirUnidadMedidaVentas(prov := "", useClipboard := true){ ;Desvergonzadament
     if(Clipboard != initialMedidaVentas){
         CambiarCampoVentanaArticulos(campoMedidaVentas, Clipboard)
     }
+}
+
+CambiarProveedor(prov := ""){
+    if(prov == ""){
+        return false
+    }
+    
+    if(not WinExist(ventanaArticulos)){
+        MsgBox CorregirMedidaVentas - No existe %ventanaArticulos%.
+        return false
+    }
+    
+    If(!IsAlwaysOnTop(ventanaArticulos)){
+        WinActivate, %ventanaArticulos%
+        WinWait, %ventanaArticulos%
+    }
+    
+    WinMenuSelectItem, %ventanaArticulos%, , Proveedor
+    WinWait, %ventanaProveedor%
+    
+    WinGetPos,,, proov_w, proov_h, %ventanaProveedor%
+    WinMove, %ventanaProveedor%,, (A_ScreenWidth/2)-(proov_w/2), (A_ScreenHeight/2)-(proov_h/2)
+    WinSet, AlwaysOnTop, On, %ventanaProveedor%
+    
+    ControlFocus, %campoCodigoProveedor%, %ventanaProveedor% ;Si no hacemos focus, Tango no detecta que hicimos algún cambio.
+    ControlSetText, %campoCodigoProveedor%, %prov%, %ventanaProveedor%
+    WinWait, %ventanaProveedor%
+    ControlSend, %campoCodigoProveedor%, {Enter}, %ventanaProveedor%
+    WinWait, %ventanaProveedor%
+    ControlSend, %campoCodigoProveedor%, {F10}, %ventanaProveedor%
+    WinWait, %ventanaProveedor%
+    ControlSend, %campoCodigoProveedor%, {F10}, %ventanaProveedor%
 }
 
 PegarUnidadMedidaVentas(){ ;Para medidas desesperadas.
