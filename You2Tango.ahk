@@ -736,8 +736,17 @@ CerrarVentanaBuscar(){
 LogPriceChange(itemID := "", oldPrice := "", newPrice = "", mult := ""){
     percent := (100*newPrice/oldPrice)-100
     percent := Round(percent, 1)
-    finalText = %itemID%: %percent%`% (x%mult%, %oldPrice% -> %newPrice%)`r`n
+    finalText = %itemID%: %percent%`% (x%mult%, %oldPrice% -> %newPrice%)
+    if(codeArray){
+        prog := ObjIndexOf(codeArray, itemID)
+        length := codeArray.Length()
+        if(prog){
+            finalText = %finalText% - %prog%/%length% ;concatenation
+        }
+    }
+    finalText = %finalText%`r`n ;concatenation
     LogSend(finalText)
+
 }
 
 LogArticleDeletion(itemID := "", oldDesc := ""){
@@ -1009,6 +1018,14 @@ PrevFromArray(arr, num){
         }
         prevnum := nextnum
     }
+}
+
+ObjIndexOf(obj, item, case_sensitive:=false)
+{
+	for i, val in obj {
+		if (case_sensitive ? (val == item) : (val = item))
+			return i
+	}
 }
 
 StrJoin(arr, del) {
