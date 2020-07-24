@@ -263,11 +263,7 @@ MassActualizarDesc(){
     }
 }
 
-CorregirUnidadMedidaVentas(prov := ""){ ;Desvergonzadamente ad-hoc. Requiere argumento.
-    if(prov == ""){
-        return false
-    }
-    
+CorregirUnidadMedidaVentas(prov := "", useClipboard := true){ ;Desvergonzadamente ad-hoc.
     if(not WinExist(ventanaArticulos)){
         MsgBox CorregirMedidaVentas - No existe %ventanaArticulos%.
         return false
@@ -279,7 +275,9 @@ CorregirUnidadMedidaVentas(prov := ""){ ;Desvergonzadamente ad-hoc. Requiere arg
     }
     
     initialMedidaVentas := GetUnidadMedidaVentas(true)
-    Clipboard := initialMedidaVentas
+    if(!useClipboard){
+        Clipboard := initialMedidaVentas
+    }
     if(prov == "Ferrolux"){
         Clipboard := RegExReplace(Clipboard, "([a-zA-Z])([1-9])","$1-$2")
         Clipboard := RegExReplace(Clipboard, " ","")
