@@ -138,7 +138,7 @@ CambiarCampoVentanaArticulos(field := "", newText = ""){
     
     ;if(WinExist(ventanaBuscar)){
     ;    CerrarVentanaBuscar()
-    ;}
+    ;-}
     
     If(!IsAlwaysOnTop(ventanaArticulos)){
         WinActivate, %ventanaArticulos%
