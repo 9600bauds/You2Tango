@@ -557,7 +557,7 @@ ProximoArticulo(){
             return
         }
         next := NextFromArray(CodeArray, GetCodigoVentanaArticulos())
-        if (next == GetCodigoVentanaArticulos() + 1){
+        if(RegExReplace(next, "[^0-9]", "") == RegExReplace(GetCodigoVentanaArticulos(), "[^0-9]", "") + 1){ ;numbers only
             next = ;just go forward normally
         }
     }
@@ -588,7 +588,7 @@ AnteriorArticulo(){
             return
         }
         prev := PrevFromArray(CodeArray, GetCodigoVentanaArticulos())
-        if (prev == GetCodigoVentanaArticulos() - 1){
+        if (RegExReplace(prev, "[^0-9]", "") == RegExReplace(GetCodigoVentanaArticulos(), "[^0-9]", "") - 1){ ;numbers only
             prev = ;just go backwards normally
         }
     }
