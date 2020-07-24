@@ -225,6 +225,9 @@ ActualizarDescripFecha(doAfter:="", replacement:=""){
     ControlGetText, oldDesc, %campoDescAdicional%, %ventanaArticulos% ;Para el logging.
     ControlGetText, Clipboard, %campoDescAdicional%, %ventanaArticulos% ;Copiamos al portapapeles, por si accidentalmente sobreescribimos la descripción de un artículo equivocado.
     
+    RegExMatch(oldDesc, "( .*)", extraInfo) ;Preserve everything after a space.
+    replacement := replacement . extraInfo1
+    
     if(not CambiarCampoVentanaArticulos(campoDescAdicional, replacement)){
         return false
     }
@@ -415,6 +418,19 @@ PegarPrecio98o99(mult:=1){
         return
     }
     multiplied := (Clipboard * mult)
+    
+    ControlGetText, descAdicional, %campoDescAdicional%, %ventanaArticulos% 
+    RegExMatch(descAdicional, ".*\^([0-9.]+)", extraMults)
+    if(extraMults1){
+        MsgBox, Multiplying price by extra multiplier of %extraMults1%.
+        multiplied := multiplied * extraMults1
+    }
+    RegExMatch(descAdicional, ".*\¬([0-9.]+)", extraDivisions)
+    if(extraDivisions1){
+        MsgBox, Dividing price by extra divisor of %extraDivisions1%.
+        multiplied := multiplied / extraDivisions1
+    }
+    
     multiplied = % Round(multiplied, 2) ;Tango sólo quiere 2 decimales.
     
     itemID := GetCodigoVentanaPrecios()
