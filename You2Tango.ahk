@@ -617,17 +617,17 @@ GoToAll(codigo){
     WinMenuSelectItem, %ventanaArticulos%, , Buscar, Por Clave
     WinMenuSelectItem, %ventanaPrecios%, , Buscar, Por Clave
     
-    WinWait, %ventanaBuscar_Articulos%
+    WinWait, %ventanaBuscar_Articulos%,,5
     ControlFocus, %campoContenido_Buscar%, %ventanaBuscar_Articulos% ;Si no hacemos focus, Tango no detecta que hicimos algún cambio.
     Control, EditPaste, %codigo%, %campoContenido_Buscar%, %ventanaBuscar_Articulos%
     
-    WinWait, %ventanaBuscar_Precios%
+    WinWait, %ventanaBuscar_Precios%,,5
     ControlFocus, %campoContenido_Buscar%, %ventanaBuscar_Precios% ;Si no hacemos focus, Tango no detecta que hicimos algún cambio.
     Control, EditPaste, %codigo%, %campoContenido_Buscar%, %ventanaBuscar_Precios%
     
-    WinWait, %ventanaBuscar_Articulos%
+    WinWait, %ventanaBuscar_Articulos%,,5
     ControlSend,, {Enter 2}, %ventanaBuscar_Articulos%
-    WinWait, %ventanaBuscar_Precios%
+    WinWait, %ventanaBuscar_Precios%,,5
     ControlSend,, {Enter 2}, %ventanaBuscar_Precios%
 }
 ;}
@@ -647,11 +647,11 @@ BuscarPorPortapapel(){
         }
         WinWait, Find & Replace
         Send, ^v{Enter} ;Ctrl+V+Enter
-        Sleep, 100 ;todo see if this can be done better
-        WinWait, Find & Replace
+        Sleep, 300 ;todo see if this can be done better
+        WinWait, Find & Replace ;TODO doesn't work
         if(PicExists("Images/OpenOfficeCalc/EndOf.png")){ ;Damn you, OpenOffice.
             Send, {Enter}
-            Sleep, 100
+            Sleep, 300 ;todo see if this can be done better
         }
         if(PicExists("Images/OpenOfficeCalc/NotFound.png")){ ;Damn you, OpenOffice.
             Send, {Enter}
