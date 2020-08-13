@@ -695,11 +695,10 @@ BuscarPorPortapapel(){
         }
         WinWait, Find & Replace
         Send, ^v{Enter} ;Ctrl+V+Enter
-        Sleep, 300 ;todo see if this can be done better
-        WinWait, Find & Replace ;TODO doesn't work
+        WinWait, %ventanaCalc%
         if(PicExists("Images/OpenOfficeCalc/EndOf.png")){ ;Damn you, OpenOffice.
             Send, {Enter}
-            Sleep, 300 ;todo see if this can be done better
+            WinWait, %ventanaCalc%
         }
         if(PicExists("Images/OpenOfficeCalc/NotFound.png")){ ;Damn you, OpenOffice.
             Send, {Enter}
