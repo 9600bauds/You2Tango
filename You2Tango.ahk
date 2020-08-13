@@ -182,6 +182,34 @@ AceptarCambiosVentanaArticulos(){
     ControlSend, %campoOKchild_1%, {F10}, %ventanaArticulos_OKchild%
     WinWait, %ventanaArticulos_OKchild%
     ControlSend, %campoOKchild_2%, {F10}, %ventanaArticulos_OKchild%
+GetIVAType(){
+    DetectHiddenWindows, On
+    
+    if(not WinExist(ventanaArticulos)){
+        MsgBox GetIVAType - No existe %ventanaArticulos%.
+        return
+    }
+    
+    WinMenuSelectItem, %ventanaArticulos%, , Modificar
+    WinWait, %ventanaArticulos%
+    ControlSend, %campoDesc_Articulos%, {F10}, %ventanaArticulos%
+    WinWait, %ventanaArticulos_OKchild%
+    ControlGetText, IVAType, %campoOKChild_1%, %ventanaArticulos_OKchild%
+    ControlSend, %campoOKchild_1%, {Esc}, %ventanaArticulos_OKchild%
+    WinWait, %ventanaArticulos%
+    ControlSend, %campoDesc_Articulos%, {Esc}, %ventanaArticulos%
+    WinWait, %ventanaArticulos%
+    return IVAType
+}
+
+FixIVA(){
+    ControlGetText, descAdicional, %campoDescAdicional%, %ventanaArticulos% 
+    if(not InStr(descAdicional, "½IVA") and GetIVAType() == 2){
+        ;MsgBox, Arreglando descripción adicional para incluir ½IVA.
+        descfinal = %descAdicional% ½IVA
+        CambiarCampoVentanaArticulos(descAdicional, descfinal)
+        return
+    }
 }
 
 GoToVentanaArticulos(num := "", searchType := 0){
