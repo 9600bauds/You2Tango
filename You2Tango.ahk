@@ -74,6 +74,9 @@ global codeArray := []
 global AdHocMode := false
 
 global PostSearchString := ""
+
+global codeArrayTime := 0
+global lastPriceModificationTime := 0
 ;}
 
 ;{ Ventana Artículos - Helpers
@@ -182,6 +185,9 @@ AceptarCambiosVentanaArticulos(){
     ControlSend, %campoOKchild_1%, {F10}, %ventanaArticulos_OKchild%
     WinWait, %ventanaArticulos_OKchild%
     ControlSend, %campoOKchild_2%, {F10}, %ventanaArticulos_OKchild%
+    WinWait, %ventanaArticulos%
+}
+
 GetIVAType(){
     DetectHiddenWindows, On
     
@@ -523,6 +529,7 @@ PegarPrecio98o99(mult:=1){
     
     itemID := GetCodigoVentanaPrecios()
     LogPriceChange(itemID, oldPrice, multiplied, mult)
+    lastPriceModificationTime := A_TickCount
     
     ControlSetText, %campoPrecioActual%, %multiplied%, %ventanaPrecios%
     Send, {F10}
@@ -555,6 +562,7 @@ MultiplicarPrecio98o99(mult:=0){
     multiplied = % Round(multiplied, 2) ;Tango sólo quiere 2 decimales.
     
     LogPriceChange(itemID, oldPrice, multiplied, mult)
+    lastPriceModificationTime := A_TickCount
     
     ControlSetText, %campoPrecioActual%, %multiplied%, %ventanaPrecios%
     Send, {F10}
@@ -812,11 +820,15 @@ LogPriceChange(itemID := "", oldPrice := "", newPrice = "", mult := ""){
     percent := (100*newPrice/oldPrice)-100
     percent := Round(percent, 1)
     finalText = %itemID%: %percent%`% (x%mult%, %oldPrice% -> %newPrice%)
-    if(codeArray){
+    if(codeArray.Length() > 0){
         prog := ObjIndexOf(codeArray, itemID)
         length := codeArray.Length()
         if(prog){
             finalText = %finalText% - %prog%/%length% ;concatenation
+        }
+        if(lastPriceModificationTime > 0 or codeArrayTime > 0){
+            timeElapsed := Round((A_TickCount - max(lastPriceModificationTime, codeArrayTime)) / 1000)
+            finalText = %finalText%: %timeElapsed%s
         }
     }
     finalText = %finalText%`r`n ;concatenation
@@ -907,6 +919,7 @@ importCodeArray(){
             }
         }
     }
+    codeArrayTime := A_TickCount
     
     array2text := StrJoin(CodeArray, ", ")
     MsgBox, 305, CodeArray Import, Import result:`r%array2text%`r`rGo to first entry? ;1+48+256
