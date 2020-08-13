@@ -432,12 +432,30 @@ PegarPrecio98o99(mult:=1){
         return false
     }
     
-    if(not SeleccionarPrecio98o99()){
-        return false
-    }
     mult := ParsePercent(mult)
     if(mult == 0){
         MsgBox, Multiplicador inválido! - PegarPrecio98o99
+        return false
+    }
+    ControlGetText, descAdicional, %campoDescAdicional%, %ventanaArticulos% 
+    RegExMatch(descAdicional, ".*\^([0-9.]+)", extraMults)
+    if(extraMults1){
+        MsgBox, Multiplying price by extra multiplier of %extraMults1%.
+        mult := mult * extraMults1
+    }
+    RegExMatch(descAdicional, ".*\¬([0-9.]+)", extraDivisions)
+    if(extraDivisions1){
+        MsgBox, Dividing price by extra divisor of %extraDivisions1%.
+        mult := mult / extraDivisions1
+    }
+    if(InStr(descAdicional, "½IVA")){
+        if(mult != 1){
+            ;MsgBox, Dividiendo el IVA a la mitad.
+            mult := mult / 1.21 * 1.105
+        }
+    }
+    
+    if(not SeleccionarPrecio98o99()){
         return false
     }
     
@@ -451,24 +469,16 @@ PegarPrecio98o99(mult:=1){
         MsgBox, Clipboard is not a number.
         return
     }
+    
     multiplied := (Clipboard * mult)
     
-    ControlGetText, descAdicional, %campoDescAdicional%, %ventanaArticulos% 
-    RegExMatch(descAdicional, ".*\^([0-9.]+)", extraMults)
-    if(extraMults1){
-        MsgBox, Multiplying price by extra multiplier of %extraMults1%.
-        multiplied := multiplied * extraMults1
-    }
-    RegExMatch(descAdicional, ".*\¬([0-9.]+)", extraDivisions)
-    if(extraDivisions1){
-        MsgBox, Dividing price by extra divisor of %extraDivisions1%.
-        multiplied := multiplied / extraDivisions1
+    ControlGetText, oldPrice, %campoPrecioActual%, %ventanaPrecios%
+    if(multiplied * 800 < oldPrice){
+        multiplied := multiplied * 1000
     }
     
     multiplied = % Round(multiplied, 2) ;Tango sólo quiere 2 decimales.
     
-    itemID := GetCodigoVentanaPrecios()
-    ControlGetText, oldPrice, %campoPrecioActual%, %ventanaPrecios%
     
     percent := (100*multiplied/oldPrice)-100
     percent := Round(percent, 1)
@@ -482,6 +492,8 @@ PegarPrecio98o99(mult:=1){
             return 0
         }
     }
+    
+    itemID := GetCodigoVentanaPrecios()
     LogPriceChange(itemID, oldPrice, multiplied, mult)
     
     ControlSetText, %campoPrecioActual%, %multiplied%, %ventanaPrecios%
