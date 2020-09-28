@@ -71,7 +71,7 @@ global parseNoDecimals := false
 global enableCodeArray := true
 global codeArray := []
 
-global AdHocMode := false
+global AdHocMode := true
 
 global PostSearchString := ""
 
@@ -895,6 +895,7 @@ toggleNoDecimals(){
 Menu, Tray, Add  ; Add a separator line.
 
 Menu, Tray, Add, AdHocmode, toggleAdHocmode
+Menu, Tray, Check, AdHocmode
 toggleAdHocMode(){
     if(AdHocMode == true){
         Menu, Tray, Uncheck, AdHocmode
