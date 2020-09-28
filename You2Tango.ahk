@@ -1281,4 +1281,9 @@ else{
     PegarPrecio98o99(multiplicadorPrecio2)
 }
 return
+
+MButton::
+Click, 2
+AdHoc(multiplicadorPrecio1)
+return
 ;}
