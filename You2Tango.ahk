@@ -722,21 +722,40 @@ BuscarPorPortapapel(){
         WinActivate, %ventanaCalc%
         WinWait, %ventanaCalc%
         if WinExist(ventanaCalc_Buscar){
-            WinActivate, Find & Replace
-            WinWait, Find & Replace
+            WinActivate, %ventanaCalc_Buscar%
+            WinWait, %ventanaCalc_Buscar%
             Send, !s ;Alt+S: Search For
         }
         else{
             Send, ^f ;Ctrl+F: Buscar
         }
-        WinWait, Find & Replace
+        WinWait, %ventanaCalc_Buscar%
+        WinGet, ventanaBuscarID, ID, ventanaCalc_Buscar
         Send, ^v{Enter} ;Ctrl+V+Enter
-        WinWait, %ventanaCalc%
-        if(PicExists("Images/OpenOfficeCalc/EndOf.png")){ ;Damn you, OpenOffice.
+        WinWaitNotActive, ahk_id %ventanaBuscarID%, , 5000
+        
+        ;WinWait, %ventanaCalc%
+        ;WinWait, %ventanaCalc_Buscar%
+        ;Loop{
+        ;    WinGet, activeID, ID, A
+        ;    ;if(A_Index = 20 or A_Cursor <> "Wait"){
+        ;    if(A_Index = 20 or activeID <> ventanaBuscarID){
+        ;        Break
+        ;    }
+        ;    Sleep, 50
+        ;}
+        ;WinWait, %ventanaCalc%
+        ;WinWait, %ventanaCalc_Buscar%
+        ;WinWait, %ventanaCalc_Main%
+
+        WinGetPos, , , winWidth, winHeight, A
+        ;if(PicExists("Images/OpenOfficeCalc/EndOf.png")){ ;Damn you, OpenOffice.
+        if(winWidth == 458 and winHeight == 100){ ;"End of File" dialog
             Send, {Enter}
             WinWait, %ventanaCalc%
         }
-        if(PicExists("Images/OpenOfficeCalc/NotFound.png")){ ;Damn you, OpenOffice.
+        ;if(PicExists("Images/OpenOfficeCalc/NotFound.png")){ ;Damn you, OpenOffice.
+        if(winWidth == 190 and winHeight == 110){ ;"Not Found" dialog
             Send, {Enter}
             OnUnsuccessfulSearch()
             return 0
