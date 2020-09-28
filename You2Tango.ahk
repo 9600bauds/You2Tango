@@ -213,7 +213,7 @@ FixIVA(){
     if(not InStr(descAdicional, "½IVA") and GetIVAType() == 2){
         ;MsgBox, Arreglando descripción adicional para incluir ½IVA.
         descfinal = %descAdicional% ½IVA
-        CambiarCampoVentanaArticulos(descAdicional, descfinal)
+        CambiarCampoVentanaArticulos(campoDescAdicional, descfinal)
         return
     }
 }
