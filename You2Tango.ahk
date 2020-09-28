@@ -89,8 +89,11 @@ GetUnidadMedidaVentas(noModify := false){
     WinWait, %ventanaArticulos%
     ControlGetText, unidadMedida, %campoMedidaVentas%, %ventanaArticulos%
     
-    if(unidadMedida == "" or unidadMedida == "NO TRAER" or RegExMatch(unidadMedida, "$[-]+^")){
+    if(unidadMedida == "" or unidadMedida == "NO TRAER" or RegExMatch(unidadMedida, "^[-]+$")){
         MsgBox, GetUnidadMedidaVentas - Unidad inválida. (%unidadMedida%)
+        if(AdHocMode){
+            ProximoArticulo()
+        }
         return
     }
     
@@ -119,6 +122,7 @@ GetUnidadMedidaVentas(noModify := false){
         else if(searchType == search_Fabrimport){
             if(InStr(unidadMedida, "*")){
                 MsgBox, GetUnidadMedidaVentas - Salteando por asterisco. (%unidadMedida%)
+                ProximoArticulo()
                 return
             }
             unidadMedida := "[^0-9]" . unidadMedida . "$"
